@@ -3,11 +3,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema
 from rest_framework import mixins, status
 from rest_framework.decorators import action
-from rest_framework.filters import OrderingFilter
+from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 
+from book.filters import BookFilter
 from book.models import Book
 from book.serializers import BookSerializer, BookImageSerializer
 
@@ -23,7 +24,8 @@ class BookViewSet(
 ):
     queryset = Book.objects.all()
 
-    filter_backends = [DjangoFilterBackend, OrderingFilter]
+    filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
+    search_fields = ["title", "cover", "inventory"]
     filterset_class = BookFilter
     ordering_fields = ["title", "author", "inventory", "daily_fee"]
     ordering = ["id"]
