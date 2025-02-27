@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets, mixins
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
@@ -6,6 +7,7 @@ from payment.models import Payment
 from payment.serializers import PaymentSerializer, PaymentDetailSerializer
 
 
+@extend_schema(tags=["books"])
 class PaymentViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -34,9 +36,9 @@ class PaymentViewSet(
 
 @api_view(["GET"])
 def payment_success_view(request):
-    pass # TODO check successful stripe payment
+    pass  # TODO check successful stripe payment
 
 
 @api_view(["GET"])
 def payment_cancel_view(request):
-    pass # TODO return payment paused message (just message)
+    pass  # TODO return payment paused message (just message)
