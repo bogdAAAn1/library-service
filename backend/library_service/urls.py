@@ -19,7 +19,8 @@ from django.conf.urls.static import static
 
 from django.contrib import admin
 from django.urls import path, include
-from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView
+from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, \
+    SpectacularAPIView
 
 from library_service import settings
 
@@ -30,6 +31,7 @@ urlpatterns = [
     path("api/user/", include("user.urls", namespace="user")),
     path("api/book/", include("book.urls", namespace="book")),
     path("api/borrowings/", include("borrowing.urls", namespace="borrowing")),
+    path("api/doc/", SpectacularAPIView.as_view(), name="schema"),
     path(
         "api/doc/swagger/",
         SpectacularSwaggerView.as_view(url_name="schema"),
