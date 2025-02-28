@@ -34,11 +34,6 @@ class UserManager(BaseUserManager):
 
 
 class User(AbstractUser):
-    # email = models.EmailField(unique=True)
-    # first_name = models.CharField(max_length=30)
-    # last_name = models.CharField(max_length=30)
-    # password = models.CharField(max_length=128)
-    # is_staff = models.BooleanField(default=False)
     username = None
     email = models.EmailField(unique=True)
     tg_chat = models.IntegerField(null=True, blank=True, unique=True)
