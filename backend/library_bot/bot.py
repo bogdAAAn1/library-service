@@ -9,23 +9,20 @@ import logging
 from telegram import Update
 from telegram.ext import Application, CommandHandler, CallbackContext
 
-
+# Settings
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
-
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "library_service.settings")
-
 django.setup()
-
 User = get_user_model()
 
+# Logging
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logging.getLogger("httpx").setLevel(logging.WARNING)
-
 logger = logging.getLogger(__name__)
 
-
+# Functions
 
 async def start(update: Update, context: CallbackContext) -> None:
     user_telegram_id = update.message.chat_id
