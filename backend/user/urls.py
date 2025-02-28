@@ -9,3 +9,5 @@ router.register("user", UserViewSet)
 urlpatterns = [
     path("", include(router.urls)),
 ]
+
+app_name = "user"
