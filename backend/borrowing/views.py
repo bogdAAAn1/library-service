@@ -3,16 +3,23 @@ from datetime import datetime
 from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
-from django.urls import reverse
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
+from rest_framework.status import (
+    HTTP_200_OK,
+    HTTP_201_CREATED,
+    HTTP_400_BAD_REQUEST
+)
 
 from book.models import Book
 from borrowing.models import Borrowing
-from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer, BorrowingRetrieveSerializer, \
+from borrowing.serializers import (
+    BorrowingSerializer,
+    BorrowingListSerializer,
+    BorrowingRetrieveSerializer,
     BorrowingReturnSerializer
+)
 
 
 def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
@@ -77,6 +84,5 @@ def borrowing_return(request, pk):
         borrowing.save()
         return Response(BorrowingReturnSerializer(borrowing).data, status=HTTP_200_OK)
     else:
-
         return Response(BorrowingReturnSerializer(borrowing).data, status=HTTP_400_BAD_REQUEST)
 

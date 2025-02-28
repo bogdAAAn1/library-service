@@ -10,11 +10,11 @@ class BorrowingSerializer(serializers.ModelSerializer):
         model = Borrowing
         fields = ("id", "expected_return_date", "book")
 
-    # def to_representation(self, instance):
-    #     data = super().to_representation(instance)
-    #     if instance.book.inventory == 0:
-    #         return None
-    #     return data
+    def validate(self, attrs):
+        if attrs["book"].inventory < 1:
+            raise serializers.ValidationError("This book is not available")
+
+        return attrs
 
 
 class BorrowingListSerializer(serializers.ModelSerializer):
