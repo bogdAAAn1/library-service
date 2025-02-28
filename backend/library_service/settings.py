@@ -45,6 +45,8 @@ INSTALLED_APPS = [
     "django_filters",
     "rest_framework",
     "library_service",
+    "rest_framework",
+    "drf_spectacular",
     "book",
     "borrowing",
     "payment",
@@ -154,7 +156,9 @@ SPECTACULAR_SETTINGS = {
         "defaultModelRendering": "model",
         "defaultModelsExpandDepth": 2,
         "defaultModelExpandDepth": 2,
-    }
+    },
+}
+
 
 AUTH_USER_MODEL = "user.User"
 
