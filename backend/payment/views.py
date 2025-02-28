@@ -7,7 +7,7 @@ from payment.models import Payment
 from payment.serializers import PaymentSerializer, PaymentDetailSerializer
 
 
-@extend_schema(tags=["books"])
+@extend_schema(tags=["payments"])
 class PaymentViewSet(
     mixins.ListModelMixin,
     mixins.RetrieveModelMixin,
@@ -34,11 +34,13 @@ class PaymentViewSet(
         return self.serializer_class
 
 
+@extend_schema(tags=["payments"])
 @api_view(["GET"])
 def payment_success_view(request):
     pass  # TODO check successful stripe payment
 
 
+@extend_schema(tags=["payments"])
 @api_view(["GET"])
 def payment_cancel_view(request):
     pass  # TODO return payment paused message (just message)

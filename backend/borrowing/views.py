@@ -2,6 +2,7 @@ from datetime import datetime
 
 from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
+from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
@@ -21,6 +22,7 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
     return borrowings
 
 
+@extend_schema(tags=["borrowings"])
 @api_view(["GET", "POST"])
 def borrowing_list(request):
     if request.method == "GET":
@@ -50,6 +52,8 @@ def borrowing_list(request):
         book.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
+
+@extend_schema(tags=["borrowings"])
 @api_view(["GET"])
 def borrowing_detail(request, pk):
     borrowing = Borrowing.objects.get(pk=pk)
@@ -57,6 +61,7 @@ def borrowing_detail(request, pk):
     return Response(serializer.data, status=HTTP_200_OK)
 
 
+@extend_schema(tags=["borrowings"])
 @api_view(["POST"])
 def borrowing_return(request, pk):
     borrowing = Borrowing.objects.get(pk=pk)

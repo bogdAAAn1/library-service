@@ -1,3 +1,4 @@
+from drf_spectacular.utils import extend_schema
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated
 
@@ -6,6 +7,7 @@ from user.serializers import UserSerializer
 from user.permissions import IsPermission
 
 
+@extend_schema(tags=["user"])
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
