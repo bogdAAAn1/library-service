@@ -1,8 +1,11 @@
 from datetime import datetime
 
+from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
+from django.urls import reverse
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
@@ -22,6 +25,7 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
 
 
 @api_view(["GET", "POST"])
+@permission_required([IsAuthenticated])
 def borrowing_list(request):
     if request.method == "GET":
         borrowing = Borrowing.objects.all()
@@ -51,6 +55,7 @@ def borrowing_list(request):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
 @api_view(["GET"])
+@permission_required([IsAuthenticated])
 def borrowing_detail(request, pk):
     borrowing = Borrowing.objects.get(pk=pk)
     serializer = BorrowingRetrieveSerializer(borrowing)
@@ -58,6 +63,7 @@ def borrowing_detail(request, pk):
 
 
 @api_view(["POST"])
+@permission_required([IsAuthenticated])
 def borrowing_return(request, pk):
     borrowing = get_object_or_404(Borrowing, pk=pk)
 
