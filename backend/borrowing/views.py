@@ -1,7 +1,11 @@
+from datetime import datetime
+
+from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
 from rest_framework.decorators import api_view
+from rest_framework.permissions import IsAdminUser
 from rest_framework.response import Response
-from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
 from borrowing.models import Borrowing
 from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer, BorrowingRetrieveSerializer
@@ -17,6 +21,7 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
 
 
 @api_view(["GET", "POST"])
+@permission_required([IsAdminUser])
 def borrowing_list(request):
     if request.method == "GET":
         borrowing = Borrowing.objects.all()
@@ -48,3 +53,15 @@ def borrowing_detail(request, pk):
     borrowing = Borrowing.objects.get(pk=pk)
     serializer = BorrowingRetrieveSerializer(borrowing)
     return Response(serializer.data, status=HTTP_200_OK)
+
+
+@api_view(["POST"])
+def borrowing_return(request, pk):
+    borrowing = Borrowing.objects.get(pk=pk)
+    if borrowing.actual_return_date is None:
+        borrowing.actual_return_date = datetime.now()
+        borrowing.book.inventory += 1
+        borrowing.save()
+        return Response(status=HTTP_200_OK)
+    else:
+        return Response(status=HTTP_404_NOT_FOUND)
