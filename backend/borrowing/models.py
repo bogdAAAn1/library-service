@@ -17,3 +17,7 @@ class Borrowing(models.Model):
         on_delete=models.CASCADE,
         related_name="borrowings"
     )
+
+    def __str__(self) -> str:
+        return f"Borrowing by {self.user} - Book: {self.book.title} on {self.borrow_date}"
+
