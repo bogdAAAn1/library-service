@@ -3,10 +3,11 @@ from datetime import datetime
 from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
 from rest_framework.decorators import api_view
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_404_NOT_FOUND
 
+from book.models import Book
 from borrowing.models import Borrowing
 from borrowing.serializers import BorrowingSerializer, BorrowingListSerializer, BorrowingRetrieveSerializer
 
@@ -21,7 +22,6 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
 
 
 @api_view(["GET", "POST"])
-@permission_required([IsAuthenticated])
 def borrowing_list(request):
     if request.method == "GET":
         borrowing = Borrowing.objects.all()
@@ -45,7 +45,9 @@ def borrowing_list(request):
         serializer = BorrowingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         serializer.save(user=request.user)
-        serializer.data.get("book").inventory -= 1
+        book = Book.objects.get(id=serializer.data.get("book"))
+        book.inventory -= 1
+        book.save()
         return Response(serializer.data, status=HTTP_201_CREATED)
 
 @api_view(["GET"])
