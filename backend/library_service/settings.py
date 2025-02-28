@@ -52,6 +52,7 @@ INSTALLED_APPS = [
     "payment",
     "user",
     "library_bot",
+    "django_celery_beat",
 ]
 
 MIDDLEWARE = [
@@ -120,7 +121,7 @@ AUTH_PASSWORD_VALIDATORS = [
 
 LANGUAGE_CODE = "en-us"
 
-TIME_ZONE = "UTC"
+TIME_ZONE = "Europe/Kyiv"
 
 USE_I18N = True
 
