@@ -22,7 +22,7 @@ class Book(models.Model):
     author = models.CharField(max_length=255)
     cover = models.CharField(max_length=10, choices=CoverChoices.choices)
     inventory = models.PositiveIntegerField()
-    daily_fee = models.DecimalField()
+    daily_fee = models.DecimalField(decimal_places=2, max_digits=10)
     image = models.ImageField(null=True, upload_to=book_image_file_path)
 
     def __str__(self):

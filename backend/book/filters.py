@@ -8,9 +8,13 @@ class BookFilter(django_filters.FilterSet):
     id = django_filters.CharFilter(method="search_by_ids")
     author = django_filters.CharFilter(method="search_by_authors")
 
-    daily_fee = django_filters.NumberFilter(field_name="daily_fee") # /api/books/?daily_fee=15.50
+    daily_fee = django_filters.NumberFilter(
+        field_name="daily_fee"
+    )  # /api/books/?daily_fee=15.50
 
-    min_fee = django_filters.NumberFilter(field_name="daily_fee", lookup_expr="gte")    # /api/books/?min_fee=10&max_fee=20
+    min_fee = django_filters.NumberFilter(
+        field_name="daily_fee", lookup_expr="gte"
+    )  # /api/books/?min_fee=10&max_fee=20
     max_fee = django_filters.NumberFilter(field_name="daily_fee", lookup_expr="lte")
 
     class Meta:
