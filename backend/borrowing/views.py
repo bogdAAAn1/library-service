@@ -1,7 +1,11 @@
 from datetime import datetime
+from io import BytesIO
 
+import pandas as pd
 from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
+from django.http import HttpResponse, JsonResponse
+from django.db.models import F
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
@@ -84,5 +88,25 @@ def borrowing_return(request, pk):
         borrowing.save()
         return Response(BorrowingReturnSerializer(borrowing).data, status=HTTP_200_OK)
     else:
-        return Response(BorrowingReturnSerializer(borrowing).data, status=HTTP_400_BAD_REQUEST)
+        return Response(status=HTTP_404_NOT_FOUND)
+
+def export_borrows_to_excel():
+    borrowings = Borrowing.objects.select_related("book", "user").values(
+        "borrow_date",
+        "expected_return_date",
+        "actual_return_date",
+    ).annotate(
+        borrow_id=F("id"),
+        title=F("book__title"),
+        first_name=F("user__first_name"),
+    )
+
+    df = pd.DataFrame(list(borrowings))
+
+    file_buffer = BytesIO()
+    df.to_excel(file_buffer, index=False, engine='openpyxl')
+    file_buffer.seek(0)
+
+    return file_buffer
+
 
