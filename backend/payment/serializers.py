@@ -1,9 +1,10 @@
 from rest_framework import serializers
 
+from borrowing.serializers import BorrowingListSerializer
 from payment.models import Payment
 
 
-class PaymentSerializer(serializers.Serializer):
+class PaymentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Payment
         fields = (
@@ -18,4 +19,4 @@ class PaymentSerializer(serializers.Serializer):
 
 
 class PaymentDetailSerializer(PaymentSerializer):
-    pass # TODO nested serializer for borrowing field
+    borrowing = BorrowingListSerializer()
