@@ -4,7 +4,7 @@ from io import BytesIO
 import pandas as pd
 from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
-from django.http import HttpResponse
+from django.http import HttpResponse, JsonResponse
 from django.db.models import F
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
@@ -90,6 +90,3 @@ def export_borrows_to_excel():
     file_buffer.seek(0)
 
     return file_buffer
-
-def get_overdue_borrowings():
-    return Borrowing.objects.filter(expected_return_date__lt=datetime.now())

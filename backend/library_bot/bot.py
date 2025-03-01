@@ -20,7 +20,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 os.environ.setdefault("DJANGO_SETTINGS_MODULE", "library_service.settings")
 django.setup()
 
-from borrowing.views import get_overdue_borrowings
+from borrowing.models import Borrowing
 
 User = get_user_model()
 
@@ -116,18 +116,37 @@ async def my_borrowings(update: Update, context: CallbackContext) -> int:
     )
     return START_ROUTES
 
-async def active_borrow(update, context):
+
+async def get_overdue_borrow(user_id):
+    logger.info(f"Checking overdue borrowings for user_id: {user_id}")
+
+    return await sync_to_async(
+        lambda: Borrowing.objects.filter(
+            expected_return_date__lt=datetime.now(), user__tg_chat=user_id
+        ).select_related('book')
+        .first()
+    )()
+
+
+async def active_borrow(update: Update, context: CallbackContext) -> None:
     query = update.callback_query
     await query.answer()
+    await query.edit_message_text(text="Here you can see your active borrow.")
 
-    # Викликаємо функцію для отримання позик
-    borrowings = await sync_to_async(get_overdue_borrowings)()
+    user = update.callback_query.message.chat.id
+    logger.info(f"User ID: {user}")
 
-    if borrowings:
-        for borrow in borrowings:
-            await update.message.reply_text(f"{borrow.book.title} - {borrow.expected_return_date}")
+    book_user_borrowed = await get_overdue_borrow(user)
+    logger.info(f"Book borrowed: {book_user_borrowed}")
+
+    if book_user_borrowed:
+        await query.edit_message_text(
+            f"You have an active borrow:!\n"
+            f"Book: {book_user_borrowed.book.title}\n"
+            f"Expected return date: {book_user_borrowed.expected_return_date}"
+        )
     else:
-        await update.message.reply_text("No overdue borrowings found.")
+        await query.edit_message_text(f"No borrowing available.")
 
 def main():
     load_dotenv()
