@@ -3,11 +3,13 @@ from telegram import (
     InlineKeyboardMarkup
 )
 
-# Stages
-START_ROUTES, MY_BORROWINGS, BOOKS, PAY_BORROW, FAQ, ACTIVE_BORROW, ARCHIVE = range(7)
-
+from library_bot.user_interface.stages import *
 
 async def send_back_button(query) -> None:
+    """
+    Sends a "Back" button to the user, allowing them to navigate back to the welcome screen.
+    The message includes instructions to press the button below.
+    """
     keyboard = [[InlineKeyboardButton("Back", callback_data="WELCOME_POST")]]
     reply_markup = InlineKeyboardMarkup(keyboard)
 

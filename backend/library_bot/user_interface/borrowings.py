@@ -8,8 +8,7 @@ from telegram.ext import CallbackContext
 from borrowing.models import Borrowing
 from library_bot.user_interface.buttons import send_back_button
 
-# Stages
-START_ROUTES, MY_BORROWINGS, BOOKS, PAY_BORROW, FAQ, ACTIVE_BORROW, ARCHIVE = range(7)
+from library_bot.user_interface.stages import *
 
 # Logging
 logging.basicConfig(
@@ -19,7 +18,11 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
-async def my_borrowings(update: Update, context: CallbackContext) -> int:
+async def my_borrowings(update: Update, context: CallbackContext) -> None:
+    """
+    Handles 'My Borrowings' button, showing active and archived borrowings with a back option.
+    Returns START_ROUTES.
+    """
     query = update.callback_query
     logger.info("MY_BORROWINGS button clicked")
     await query.answer()
@@ -41,6 +44,11 @@ async def my_borrowings(update: Update, context: CallbackContext) -> int:
 
 ########Active borrow########
 async def get_overdue_borrow(user_id):
+    """
+    Fetches the overdue borrowing for a user by checking if the expected return date is past the current date.
+    Logs the user ID being checked.
+    Returns the first overdue borrowing if any.
+    """
     logger.info(f"Checking overdue borrowings for user_id: {user_id}")
 
     return await sync_to_async(
@@ -52,6 +60,13 @@ async def get_overdue_borrow(user_id):
 
 
 async def active_borrow(update: Update, context: CallbackContext) -> None:
+    """
+    Handles the 'Active Borrow' button click to display the user's active borrowings.
+    Checks if there is an overdue borrowing for the user.
+    Displays information about the borrowed book or a message indicating no active borrowings.
+    Includes a back button for navigation.
+    """
+
     query = update.callback_query
     await query.answer()
     await query.edit_message_text(text="Here you can see your active borrow.")
@@ -75,6 +90,11 @@ async def active_borrow(update: Update, context: CallbackContext) -> None:
 
 ########Archive########
 async def get_borrows_list(user_id):
+    """
+    Fetches a list of borrowings for a specific user, where the expected return date is in the past.
+    The function retrieves borrowings along with the related book details.
+    The result is returned as a list of borrowings.
+    """
 
     return await sync_to_async(
         lambda: list(
@@ -86,6 +106,13 @@ async def get_borrows_list(user_id):
     )()
 
 async def get_borrowing_archive(update: Update, context: CallbackContext) -> None:
+    """
+    Handles the request to view the borrowing archive of a user.
+    It retrieves the list of past borrowings for the user and displays details
+    of each borrowing (borrow date, book title, author, expected return date).
+    A back button is added at the end of the message for navigation.
+    """
+
     user = update.callback_query.message.chat.id
     logger.info(f"User ID: {user}")
 

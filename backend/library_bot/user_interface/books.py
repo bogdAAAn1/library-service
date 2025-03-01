@@ -14,15 +14,13 @@ from telegram.ext import ContextTypes
 
 from book.models import Book
 
-START_ROUTES, MY_BORROWINGS, BOOKS, PAY_BORROW, FAQ, ACTIVE_BORROW, ARCHIVE = range(7)
+from library_bot.user_interface.stages import *
 
 # Logging
-
 logging.basicConfig(
     format="%(asctime)s - %(name)s - %(levelname)s - %(message)s", level=logging.INFO
 )
 logging.getLogger("httpx").setLevel(logging.WARNING)
-
 logger = logging.getLogger(__name__)
 
 
