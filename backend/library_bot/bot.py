@@ -1,9 +1,11 @@
+import asyncio
 import os
 import sys
 from datetime import datetime
 
 import django
 from asgiref.sync import sync_to_async
+from django.db.models import QuerySet
 
 from dotenv import load_dotenv
 from django.contrib.auth import get_user_model
@@ -141,7 +143,7 @@ async def active_borrow(update: Update, context: CallbackContext) -> None:
 
     if book_user_borrowed:
         await query.edit_message_text(
-            f"You have an active borrow:!\n"
+            f"You have an active borrow!\n"
             f"Book: {book_user_borrowed.book.title}\n"
             f"Expected return date: {book_user_borrowed.expected_return_date}"
         )
@@ -162,6 +164,8 @@ def main():
             START_ROUTES: [
                 CallbackQueryHandler(my_borrowings, pattern="MY_BORROWINGS"),
                 CallbackQueryHandler(active_borrow, pattern="ACTIVE_BORROW"),
+                # CallbackQueryHandler(archive_borrowings, pattern="ARCHIVE"),
+
             ],
         },
         fallbacks=[CommandHandler("start", start)],
