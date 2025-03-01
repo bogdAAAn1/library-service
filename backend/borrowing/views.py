@@ -10,13 +10,13 @@ from django.shortcuts import get_object_or_404, redirect
 from django.http import HttpResponse, JsonResponse
 from django.db.models import F
 
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST
+    HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
 )
 
 from book.models import Book
@@ -40,7 +40,7 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
 
 
 @api_view(["GET", "POST"])
-@permission_required([IsAuthenticated])
+@permission_classes([IsAuthenticated, ])
 def borrowing_list(request):
     if request.method == "GET":
         borrowing = Borrowing.objects.all()
@@ -77,8 +77,9 @@ def borrowing_list(request):
 
         return Response(response_data, status=HTTP_201_CREATED)
 
+
 @api_view(["GET"])
-@permission_required([IsAuthenticated])
+@permission_classes([IsAuthenticated, ])
 def borrowing_detail(request, pk):
     borrowing = Borrowing.objects.get(pk=pk)
     serializer = BorrowingRetrieveSerializer(borrowing)
@@ -86,7 +87,7 @@ def borrowing_detail(request, pk):
 
 
 @api_view(["POST"])
-@permission_required([IsAuthenticated])
+@permission_classes([IsAuthenticated])
 def borrowing_return(request, pk):
     borrowing = get_object_or_404(Borrowing, pk=pk)
 
@@ -101,6 +102,8 @@ def borrowing_return(request, pk):
         return Response(BorrowingReturnSerializer(borrowing).data, status=HTTP_200_OK)
     else:
         return Response(status=HTTP_404_NOT_FOUND)
+
+
 
 def export_borrows_to_excel():
     borrowings = Borrowing.objects.select_related("book", "user").values(
