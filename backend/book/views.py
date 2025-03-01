@@ -56,8 +56,5 @@ class BookViewSet(
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    # @book_filter_schema()
-    # def list(selfself, request, *args, **kwargs):
-    #     """
-    #     Return filtered list if query parameters exist, else - full list of items
-    #     """
+
+0
