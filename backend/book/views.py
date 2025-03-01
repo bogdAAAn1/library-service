@@ -29,6 +29,12 @@ class BookViewSet(
     filterset_class = BookFilter
     ordering_fields = ["title", "author", "inventory", "daily_fee"]
     ordering = ["id"]
+    permission_classes = [IsAdminUser]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return []
+        return [permission() for permission in self.permission_classes]
 
     def get_serializer_class(self):
 
