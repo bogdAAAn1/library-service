@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
 import os
+from datetime import timedelta
 from pathlib import Path
 from dotenv import load_dotenv
 
@@ -54,6 +55,7 @@ INSTALLED_APPS = [
     "user",
     "library_bot",
     "django_celery_beat",
+    "rest_framework_simplejwt",
 ]
 
 MIDDLEWARE = [
@@ -150,7 +152,19 @@ CELERY_TASK_TIME_LIMIT = 30 * 60
 
 REST_FRAMEWORK = {
     "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
-    "DEFAULT_FILTER_BACKENDS": ["django_filters.rest_framework.DjangoFilterBackend"]
+    "DEFAULT_FILTER_BACKENDS":
+        ["django_filters.rest_framework.DjangoFilterBackend"],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+}
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=7000),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=3),
+    "ROTATE_REFRESH_TOKENS": True,
+    "BLACKLIST_AFTER_ROTATION": True,
+    "AUTH_HEADER_TYPES": ("Bearer",),
 }
 
 SPECTACULAR_SETTINGS = {
@@ -169,7 +183,6 @@ SPECTACULAR_SETTINGS = {
 
 AUTH_USER_MODEL = "user.User"
 
-
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
 EMAIL_HOST = os.environ['EMAIL_HOST']
 EMAIL_PORT = 587
@@ -177,3 +190,4 @@ EMAIL_USE_TLS = True
 EMAIL_HOST_USER = os.environ['EMAIL_HOST_USER']
 EMAIL_HOST_PASSWORD = os.environ['EMAIL_HOST_PASSWORD']
 RECIPIENT_ADDRESS = os.environ['RECIPIENT_ADDRESS']
+
