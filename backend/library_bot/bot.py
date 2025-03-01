@@ -1,5 +1,4 @@
 # Settings
-
 import os
 import sys
 import django
@@ -34,7 +33,8 @@ from telegram.ext import (
 
 from library_bot.user_interface.borrowings import (
     my_borrowings,
-    active_borrow
+    active_borrow,
+    get_borrowing_archive
 )
 
 from library_bot.user_interface.books import (
@@ -144,7 +144,7 @@ def main():
             START_ROUTES: [
                 CallbackQueryHandler(my_borrowings, pattern="MY_BORROWINGS"),
                 CallbackQueryHandler(active_borrow, pattern="ACTIVE_BORROW"),
-                # CallbackQueryHandler(archive_borrowings, pattern="ARCHIVE"),
+                CallbackQueryHandler(get_borrowing_archive, pattern="ARCHIVE"),
                 CallbackQueryHandler(show_book_search_hint, pattern="BOOKS"),
                 CallbackQueryHandler(welcome_post, pattern="WELCOME_POST"),
 

@@ -6,6 +6,7 @@ from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import CallbackContext
 
 from borrowing.models import Borrowing
+from library_bot.user_interface.buttons import send_back_button
 
 # Stages
 START_ROUTES, MY_BORROWINGS, BOOKS, PAY_BORROW, FAQ, ACTIVE_BORROW, ARCHIVE = range(7)
@@ -17,6 +18,7 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
+
 async def my_borrowings(update: Update, context: CallbackContext) -> int:
     query = update.callback_query
     logger.info("MY_BORROWINGS button clicked")
@@ -26,7 +28,8 @@ async def my_borrowings(update: Update, context: CallbackContext) -> int:
         [
             InlineKeyboardButton("Active borrow", callback_data="ACTIVE_BORROW"),
             InlineKeyboardButton("Archive", callback_data="ARCHIVE"),
-        ]
+        ],
+        [InlineKeyboardButton("Back", callback_data="WELCOME_POST")]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -36,6 +39,7 @@ async def my_borrowings(update: Update, context: CallbackContext) -> int:
     return START_ROUTES
 
 
+########Active borrow########
 async def get_overdue_borrow(user_id):
     logger.info(f"Checking overdue borrowings for user_id: {user_id}")
 
@@ -66,3 +70,35 @@ async def active_borrow(update: Update, context: CallbackContext) -> None:
         )
     else:
         await query.edit_message_text(f"No borrowing available.")
+
+    await send_back_button(update.callback_query)
+
+########Archive########
+async def get_borrows_list(user_id):
+
+    return await sync_to_async(
+        lambda: list(
+            Borrowing.objects.filter(
+                expected_return_date__lt=datetime.now(),
+                user__tg_chat=user_id
+            ).select_related('book')
+        )
+    )()
+
+async def get_borrowing_archive(update: Update, context: CallbackContext) -> None:
+    user = update.callback_query.message.chat.id
+    logger.info(f"User ID: {user}")
+
+    message = update.message if update.message else update.callback_query.message
+
+    borrowing_list = await get_borrows_list(user)
+    filtered_borrowings = [borrow for borrow in borrowing_list]
+    for each_borrow in filtered_borrowings:
+        await message.reply_text(
+            f"Borrow date: {each_borrow.borrow_date}\n"
+            f"Book author: {each_borrow.book.author}\n"
+            f"Book title: {each_borrow.book.title}\n"
+            f"Expected return date: {each_borrow.expected_return_date}\n"
+        )
+
+    await send_back_button(update.callback_query)
