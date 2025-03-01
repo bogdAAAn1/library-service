@@ -14,11 +14,7 @@ from drf_spectacular.utils import extend_schema
 from rest_framework.decorators import api_view
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
-from rest_framework.status import (
-    HTTP_200_OK,
-    HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST
-)
+from rest_framework.status import HTTP_200_OK, HTTP_201_CREATED, HTTP_400_BAD_REQUEST
 
 from book.models import Book
 from borrowing.models import Borrowing
@@ -26,9 +22,15 @@ from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
     BorrowingRetrieveSerializer,
-    BorrowingReturnSerializer
+    BorrowingReturnSerializer,
 )
 from payment.views import create_stripe_session
+from schemas.borrowing_schema_decorator import (
+    borrowing_list_get_schema,
+    borrowing_list_post_schema,
+    borrowing_detail_get_schema,
+    borrowing_detail_return_post_schema,
+)
 
 
 def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
@@ -40,7 +42,8 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
     return borrowings
 
 
-@extend_schema(tags=["borrowings"])
+@borrowing_list_get_schema()
+@borrowing_list_post_schema()
 @api_view(["GET", "POST"])
 @permission_required([IsAuthenticated])
 def borrowing_list(request):
@@ -80,7 +83,7 @@ def borrowing_list(request):
         return Response(response_data, status=HTTP_201_CREATED)
 
 
-@extend_schema(tags=["borrowings"])
+@borrowing_detail_get_schema()
 @api_view(["GET"])
 @permission_required([IsAuthenticated])
 def borrowing_detail(request, pk):
@@ -89,7 +92,7 @@ def borrowing_detail(request, pk):
     return Response(serializer.data, status=HTTP_200_OK)
 
 
-@extend_schema(tags=["borrowings"])
+@borrowing_detail_return_post_schema()
 @api_view(["POST"])
 @permission_required([IsAuthenticated])
 def borrowing_return(request, pk):
@@ -107,23 +110,26 @@ def borrowing_return(request, pk):
     else:
         return Response(status=HTTP_404_NOT_FOUND)
 
+
 def export_borrows_to_excel():
-    borrowings = Borrowing.objects.select_related("book", "user").values(
-        "borrow_date",
-        "expected_return_date",
-        "actual_return_date",
-    ).annotate(
-        borrow_id=F("id"),
-        title=F("book__title"),
-        first_name=F("user__first_name"),
+    borrowings = (
+        Borrowing.objects.select_related("book", "user")
+        .values(
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+        )
+        .annotate(
+            borrow_id=F("id"),
+            title=F("book__title"),
+            first_name=F("user__first_name"),
+        )
     )
 
     df = pd.DataFrame(list(borrowings))
 
     file_buffer = BytesIO()
-    df.to_excel(file_buffer, index=False, engine='openpyxl')
+    df.to_excel(file_buffer, index=False, engine="openpyxl")
     file_buffer.seek(0)
 
     return file_buffer
-
-
