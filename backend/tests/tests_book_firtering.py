@@ -177,6 +177,18 @@ class UnauthenticatedUserTests(TestCase):
         res = self.client.get(BOOK_URL + "?id=1,3&author=seredyuk&min_fee=0.7")
         self.assertEqual(1, len(res.data))
 
+    def test_pagination_works(self):
+        res_all = self.client.get(BOOK_URL)
+
+        books = Book.objects.all()
+        books_data = BookSerializer(books, many=True).data
+
+        self.assertEqual(res_all.data, books_data)
+
+        res_page = self.client.get(BOOK_URL + "?limit=2")
+        print(res_page)
+        self.assertEqual(len(res_page.data["results"]), 2)
+
 
 class AuthenticatedUserTests(TestCase):
     def setUp(self):
