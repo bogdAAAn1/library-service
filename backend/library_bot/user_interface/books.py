@@ -112,7 +112,7 @@ async def inline_book_search(update: Update, context: ContextTypes.DEFAULT_TYPE)
                     input_message_content=InputTextMessageContent(
                         f"Book: {book.title}\n"
                         f"Author: {book.author}\n"
-                        f"Description: Under construction"
+                        "Description: Lorem ipsum dolor sit amet, consectetuer"
                     ),
                 )
                 for book in filtered_books

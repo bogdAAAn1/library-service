@@ -9,13 +9,10 @@ from borrowing.tasks import send_notification_to_telegram
 def send_borrow_creation(sender, instance, created, **kwargs):
     if created:
 
-        message = (f"New borrowing created:\n"
-                   "--------------\n"
-                   f"User: {instance.user.first_name} {instance.user.last_name}\n"
-                   "--------------\n"
+        message = (f"New borrowing created:\n\n"
+                   f"User: {instance.user.first_name} {instance.user.last_name}\n\n"
                    f"Book: {instance.book.title}\n"
-                   f"Author: {instance.book.author}\n"
-                   "--------------\n"
+                   f"Author: {instance.book.author}\n\n"
                    f"Borrowing date: {instance.borrow_date}\n"
                    f"Returned date: {instance.expected_return_date}"
                    )

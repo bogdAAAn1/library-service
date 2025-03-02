@@ -32,6 +32,7 @@ from telegram.ext import (
     filters,
     InlineQueryHandler
 )
+from library_bot.user_interface.recommendations import send_recommend_book
 
 from library_bot.user_interface.faq import get_faq
 
@@ -126,6 +127,7 @@ async def welcome_post(update: Update, context: CallbackContext) -> None:
             InlineKeyboardButton("My borrowings", callback_data="MY_BORROWINGS"),
             InlineKeyboardButton("Books", callback_data="BOOKS"),
         ],
+        [InlineKeyboardButton("What to read", callback_data="RANDOM_BOOK_TO_READ")],
         [InlineKeyboardButton("FAQ", callback_data="FAQ")],
     ]
 
@@ -183,6 +185,7 @@ def main():
                 CallbackQueryHandler(active_borrow, pattern="ACTIVE_BORROW"),
                 CallbackQueryHandler(get_borrowing_archive, pattern="ARCHIVE"),
                 CallbackQueryHandler(show_book_search_hint, pattern="BOOKS"),
+                CallbackQueryHandler(send_recommend_book, pattern="RANDOM_BOOK_TO_READ"),
                 CallbackQueryHandler(get_faq, pattern="FAQ"),
                 CallbackQueryHandler(welcome_post, pattern="WELCOME_POST"),
 
