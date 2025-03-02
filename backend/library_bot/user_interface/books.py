@@ -109,6 +109,7 @@ async def inline_book_search(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 InlineQueryResultArticle(
                     id=str(uuid4()),
                     title=book.title,
+                    description="Description: Lorem ipsum dolor sit amet, consectetuer",
                     input_message_content=InputTextMessageContent(
                         f"Book: {book.title}\n"
                         f"Author: {book.author}\n"

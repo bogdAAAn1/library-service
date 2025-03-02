@@ -18,10 +18,11 @@ async def send_recommend_book(update: Update, context: CallbackContext) -> None:
     recommended_book = await get_random_book(update, context)
 
     await update.callback_query.message.reply_text(
-        "Here is your recommended book for today:\n\n"
-        f"Book: {recommended_book.title}\n"
-        f"Author: {recommended_book.author}\n\n"
-        "Description: Lorem ipsum dolor sit amet, consectetuer"
+        "*Here is your recommended book for today:*\n\n"
+        f"*Book*: {recommended_book.title}\n"
+        f"*Author*: {recommended_book.author}\n\n"
+        "*Description*: Lorem ipsum dolor sit amet, consectetuer",
+        parse_mode="MARKDOWN",
     )
 
     await send_back_button(update.callback_query)
