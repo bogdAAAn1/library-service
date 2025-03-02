@@ -4,13 +4,8 @@ import random
 
 from celery import shared_task
 from django.contrib.auth import get_user_model
-from dotenv import load_dotenv
-
 from telegram import Bot
-
 from book.models import Book
-from library_bot.user_interface.buttons import send_back_button
-from library_bot.user_interface.recommendations import get_random_book
 
 token = os.getenv("TELEGRAM_TOKEN")
 
@@ -37,6 +32,7 @@ def send_book_of_the_week():
             await bot.send_message(chat_id=user_id, text=message)
 
     asyncio.run(send())
+    return "Success"
 
 @shared_task
 def new_book_available_notification(message):
@@ -46,3 +42,4 @@ def new_book_available_notification(message):
             await bot.send_message(chat_id=user_id, text=message)
 
     asyncio.run(send())
+    return "Success"
