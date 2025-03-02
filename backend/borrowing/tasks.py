@@ -22,10 +22,8 @@ sum_of_overdue_borrows = Borrowing.objects.filter(expected_return_date__lt=datet
 @shared_task
 def morning_borrow_update():
     if sum_of_all_borrows > 0:
-        message = (f"Today we have {sum_of_all_borrows} borrowings.\n"
-                   "--------------\n"
-                   f"Total overdue {sum_of_overdue_borrows} books.\n"
-                   "--------------\n"
+        message = (f"Today we have {sum_of_all_borrows} borrowings.\n\n"
+                   f"Total overdue {sum_of_overdue_borrows} books.\n\n"
                    "Details report was send on corporate email.")
     else:
         message = f"Today we have no borrowings."

@@ -14,6 +14,6 @@ def send_borrow_creation(sender, instance, created, **kwargs):
                    f"Book: {instance.book.title}\n"
                    f"Author: {instance.book.author}\n\n"
                    f"Borrowing date: {instance.borrow_date}\n"
-                   f"Returned date: {instance.expected_return_date}"
+                   f"Expected return date: {instance.expected_return_date}"
                    )
         send_notification_to_telegram.delay(message)
