@@ -21,6 +21,7 @@ from django.contrib import admin
 from django.urls import path, include
 from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView
 
+from borrowing.views import export_borrows_to_excel
 from library_service import settings
 
 urlpatterns = [
