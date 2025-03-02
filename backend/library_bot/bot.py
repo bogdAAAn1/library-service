@@ -126,7 +126,6 @@ async def welcome_post(update: Update, context: CallbackContext) -> None:
             InlineKeyboardButton("My borrowings", callback_data="MY_BORROWINGS"),
             InlineKeyboardButton("Books", callback_data="BOOKS"),
         ],
-        [InlineKeyboardButton("Pay borrow", callback_data="PAY_BORROW"),],
         [InlineKeyboardButton("FAQ", callback_data="FAQ")],
     ]
 
