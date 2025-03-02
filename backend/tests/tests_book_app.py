@@ -1,5 +1,9 @@
+import os
+import tempfile
 from decimal import Decimal
 
+import PIL
+from PIL import Image
 from django.contrib.auth import get_user_model
 from django.test import TestCase
 from rest_framework import status
@@ -129,3 +133,50 @@ class AdminUserTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_200_OK)
         self.assertEqual(res.data["daily_fee"], str(payload["daily_fee"]))
         self.assertEqual(book.daily_fee, payload["daily_fee"])
+
+    def test_image_upload_valid_data(self):
+        new_book = Book.objects.create(title="Test Book", inventory=5, daily_fee=2.50)
+        self.assertFalse(new_book.image.name)
+
+        image_url = BOOK_URL + f"{new_book.id}/upload-image/"
+
+        image = PIL.Image.new("RGB", size=(1, 1))
+        file = tempfile.NamedTemporaryFile(suffix=".jpg", delete=False)
+        image.save(file)
+
+        with open(file.name, "rb") as f:
+            data = {"image": f}
+            res = self.client.post(image_url, data=data, format="multipart")
+
+        self.assertEqual(200, res.status_code)
+
+        new_book.refresh_from_db()
+
+        image_str = str(Book.objects.get(id=new_book.id).image)
+
+        self.assertIn(image_str, str(res.data["image"]))
+        self.assertTrue(new_book.image.name)
+
+        file.close()
+        os.remove(file.name)
+
+    def test_image_upload_invalid_data(self):
+        new_book = Book.objects.create(title="Test2 Book2", inventory=3, daily_fee=2.50)
+        self.assertFalse(new_book.image.name)
+
+        image_url = BOOK_URL + f"{new_book.id}/upload-image/"
+
+        not_image = tempfile.NamedTemporaryFile(mode="w+", suffix=".txt", delete=False)
+        not_image.write("I am fake image")
+
+        with open(not_image.name, "rb") as f:
+            data = {"image": f}
+            res = self.client.post(image_url, data=data, format="multipart")
+
+        self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
+        self.assertFalse(new_book.image.name)
+        self.assertIn("image", res.data)
+        self.assertIn("The submitted file is empty.", res.data["image"][0])
+
+        not_image.close()
+        os.remove(not_image.name)
