@@ -15,4 +15,4 @@ RUN python -m pip install --upgrade pip && \
 
 COPY . /library-service/backend/
 
-CMD ["pyhon", "celery"]
+CMD ["python", "manage.py", "runserver", "0.0.0.0:8000", "celery"]

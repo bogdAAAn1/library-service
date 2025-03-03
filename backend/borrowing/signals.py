@@ -8,19 +8,19 @@ from borrowing.tasks import send_notification_to_telegram
 from payment.models import Payment
 
 
-# @receiver(post_save, sender=Borrowing)
-# def send_borrow_creation(sender, instance, created, **kwargs):
-#     if created:
-#
-#         message = (
-#             f"New borrowing created:\n\n"
-#             f"User: {instance.user.email}\n\n"
-#             f"Book: {instance.book.title}\n"
-#             f"Author: {instance.book.author}\n\n"
-#             f"Borrowing date: {instance.borrow_date}\n"
-#             f"Expected return date: {instance.expected_return_date}"
-#         )
-#         send_notification_to_telegram.delay(message)
+@receiver(post_save, sender=Borrowing)
+def send_borrow_creation(sender, instance, created, **kwargs):
+    if created:
+
+        message = (
+            f"New borrowing created:\n\n"
+            f"User: {instance.user.email}\n\n"
+            f"Book: {instance.book.title}\n"
+            f"Author: {instance.book.author}\n\n"
+            f"Borrowing date: {instance.borrow_date}\n"
+            f"Expected return date: {instance.expected_return_date}"
+        )
+        send_notification_to_telegram.delay(message)
 
 
 def change_borrowing_status(instance):

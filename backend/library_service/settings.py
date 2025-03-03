@@ -92,12 +92,15 @@ WSGI_APPLICATION = "library_service.wsgi.application"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
 DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db.sqlite3",
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'library_db',
+        'USER': 'admin',
+        'PASSWORD': "MySecurePassword123!",
+        'HOST': 'postgres-library',
+        'PORT': '5432',
     }
 }
-
 
 # Password validation
 # https://docs.djangoproject.com/en/5.1/ref/settings/#auth-password-validators
@@ -147,7 +150,7 @@ CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL")
 CELERY_RESULT_BACKEND = os.environ.get("CELERY_RESULT_BACKEND")
 CELERY_TIMEZONE = os.environ.get("CELERY_TIMEZONE")
 CELERY_TASK_TRACK_STARTED = os.environ.get("CELERY_TASK_TRACK_STARTED")
-CELERY_TASK_TIME_LIMIT = 30 * 60
+CELERY_TASK_TIME_LIMIT =  os.environ.get("CELERY_TASK_TIME_LIMIT")
 
 STRIPE_SECRET_KEY = os.environ.get("STRIPE_SECRET_KEY")
 STRIPE_PUBLISHABLE_KEY = os.environ.get("STRIPE_PUBLISHABLE_KEY")

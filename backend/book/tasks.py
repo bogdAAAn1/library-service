@@ -10,8 +10,6 @@ from book.models import Book
 token = os.getenv("TELEGRAM_TOKEN")
 
 User = get_user_model()
-user_ids = [user.tg_chat for user in User.objects.all()]
-
 
 @shared_task
 def send_book_of_the_week():
@@ -29,6 +27,7 @@ def send_book_of_the_week():
 
     async def send():
         bot = Bot(token=token)
+        user_ids = [user.tg_chat for user in User.objects.all()]
         for user_id in user_ids:
             await bot.send_message(chat_id=user_id, text=message)
 
@@ -40,6 +39,7 @@ def send_book_of_the_week():
 def new_book_available_notification(message):
     async def send():
         bot = Bot(token=token)
+        user_ids = [user.tg_chat for user in User.objects.all()]
         for user_id in user_ids:
             await bot.send_message(chat_id=user_id, text=message)
 

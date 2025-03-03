@@ -1,6 +1,6 @@
 services:
   db:
-    image: 'postgres:latest'
+    image: 'postgres:13'
     container_name: postgres-library
     env_file:
       - .env
@@ -40,6 +40,13 @@ services:
       - ./backend:/library-service/backend
     networks:
       - library-network
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:8000/health/" ]
+      interval: 10s
+      retries: 5
+      timeout: 5s
+      start_period: 20s
+
 
   redis:
     image: redis:alpine
@@ -109,6 +116,10 @@ services:
       - .env
     volumes:
       - ./backend:/library-service/backend
+    depends_on:
+      - redis
+      - db
+      - worker
     networks:
       - library-network
 

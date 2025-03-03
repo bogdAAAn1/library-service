@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.messages.constants import SUCCESS
 from django.core.mail import EmailMessage
 from dotenv import load_dotenv
 from telegram import Bot
@@ -16,14 +15,15 @@ from borrowing.views import export_borrows_to_excel
 load_dotenv()
 token = os.getenv("TELEGRAM_TOKEN")
 chat_id = os.getenv("TELEGRAM_CHAT_ID")
-sum_of_all_borrows = Borrowing.objects.count()
-sum_of_overdue_borrows = Borrowing.objects.filter(
-    expected_return_date__lt=datetime.now()
-).count()
 
 
 @shared_task
 def morning_borrow_update():
+    sum_of_all_borrows = Borrowing.objects.count()
+    sum_of_overdue_borrows = Borrowing.objects.filter(
+        expected_return_date__lt=datetime.now()
+    ).count()
+
     if sum_of_all_borrows > 0:
         message = (
             f"Today we have {sum_of_all_borrows} borrowings.\n\n"
@@ -43,6 +43,11 @@ def morning_borrow_update():
 
 @shared_task
 def send_borrows_to_email():
+    sum_of_all_borrows = Borrowing.objects.count()
+    sum_of_overdue_borrows = Borrowing.objects.filter(
+        expected_return_date__lt=datetime.now()
+    ).count()
+
     detailed_borrows_document = export_borrows_to_excel()
     email = EmailMessage(
         subject=f"Borrowing-daily-report-"
