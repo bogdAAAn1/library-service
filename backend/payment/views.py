@@ -11,11 +11,10 @@ from payment.models import Payment
 from payment.serializers import PaymentSerializer
 
 
-@extend_schema(tags=["books"])
+@extend_schema(tags=["payments"])
+@payment_schema_view()
 class PaymentViewSet(
-    mixins.ListModelMixin,
-    mixins.RetrieveModelMixin,
-    viewsets.GenericViewSet
+    mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
     queryset = Payment.objects.select_related()
     serializer_class = PaymentSerializer
@@ -26,13 +25,10 @@ class PaymentViewSet(
 
         if user.is_staff:
             return Payment.objects.select_related()
-        return (
-            Payment.objects.
-            select_related().
-            filter(borrowing_id__user=user)
-        )
+        return Payment.objects.select_related().filter(borrowing_id__user=user)
 
 
+@payment_success_view_schema()
 @api_view(["GET"])
 def payment_success_view(request):
     session_id = request.GET.get("session_id")
@@ -48,6 +44,7 @@ def payment_success_view(request):
     return Response({"error": "Payment failed!"}, status=status.HTTP_400_BAD_REQUEST)
 
 
+@payment_chancel_view_schema()
 @api_view(["GET"])
 def payment_cancel_view(request):
     return Response({"message": "Payment was cancelled!"}, status=status.HTTP_400_BAD_REQUEST)

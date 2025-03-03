@@ -7,7 +7,8 @@ from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
 from django.db.models import F
 
-from rest_framework.decorators import api_view, permission_classes
+from drf_spectacular.utils import extend_schema
+from rest_framework.decorators import api_view, , permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
@@ -23,9 +24,15 @@ from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
     BorrowingRetrieveSerializer,
-    BorrowingReturnSerializer
+    BorrowingReturnSerializer,
 )
 from payment.utils import create_stripe_session
+from schemas.borrowing_schema_decorator import (
+    borrowing_list_get_schema,
+    borrowing_list_post_schema,
+    borrowing_detail_get_schema,
+    borrowing_detail_return_post_schema,
+)
 
 
 def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
@@ -37,6 +44,8 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
     return borrowings
 
 
+@borrowing_list_get_schema()
+@borrowing_list_post_schema()
 @api_view(["GET", "POST"])
 @permission_classes([IsAuthenticated, ])
 def borrowing_list(request):
@@ -71,6 +80,8 @@ def borrowing_list(request):
 
 
 
+
+@borrowing_detail_get_schema()
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, ])
 def borrowing_detail(request, pk):
@@ -79,6 +90,7 @@ def borrowing_detail(request, pk):
     return Response(serializer.data, status=HTTP_200_OK)
 
 
+@borrowing_detail_return_post_schema()
 @api_view(["POST"])
 @permission_classes([IsAuthenticated])
 def borrowing_return(request, pk):
@@ -109,21 +121,26 @@ def borrowing_return(request, pk):
 
 
 
+
 def export_borrows_to_excel():
-    borrowings = Borrowing.objects.select_related("book", "user").values(
-        "borrow_date",
-        "expected_return_date",
-        "actual_return_date",
-    ).annotate(
-        borrow_id=F("id"),
-        title=F("book__title"),
-        first_name=F("user__first_name"),
+    borrowings = (
+        Borrowing.objects.select_related("book", "user")
+        .values(
+            "borrow_date",
+            "expected_return_date",
+            "actual_return_date",
+        )
+        .annotate(
+            borrow_id=F("id"),
+            title=F("book__title"),
+            first_name=F("user__first_name"),
+        )
     )
 
     df = pd.DataFrame(list(borrowings))
 
     file_buffer = BytesIO()
-    df.to_excel(file_buffer, index=False, engine='openpyxl')
+    df.to_excel(file_buffer, index=False, engine="openpyxl")
     file_buffer.seek(0)
 
     return file_buffer

@@ -1,5 +1,5 @@
 from django_filters.rest_framework import DjangoFilterBackend
-from drf_spectacular.utils import extend_schema
+from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status
 from rest_framework.decorators import action
 from rest_framework.filters import OrderingFilter, SearchFilter
@@ -10,9 +10,11 @@ from rest_framework.viewsets import GenericViewSet
 from book.filters import BookFilter
 from book.models import Book
 from book.serializers import BookSerializer, BookImageSerializer
+from schemas.book_schema_decorator import book_schema_view
 
 
-@extend_schema(tags=["books"])
+@extend_schema(tags=["book"])
+@book_schema_view()
 class BookViewSet(
     mixins.CreateModelMixin,
     mixins.RetrieveModelMixin,
@@ -58,3 +60,6 @@ class BookViewSet(
             return Response(serializer.data, status=status.HTTP_200_OK)
 
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+0
