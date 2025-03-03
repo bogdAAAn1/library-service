@@ -5,6 +5,7 @@ from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
 
+from book.models import Book
 from book.signals import new_book_available
 
 

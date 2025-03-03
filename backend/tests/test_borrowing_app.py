@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch, Mock
 
 from django.contrib.auth import get_user_model
 from django.db.models.signals import pre_save, post_save
@@ -165,7 +166,13 @@ class TestBorrowingForUser(TestCase):
             "You can`t do this"
         )
 
-    def test_borrowing_return(self):
+    @patch("stripe.checkout.Session.create")
+    def test_borrowing_return(self, mock_stripe_create):
+        mock_session = Mock()
+        mock_session.id = "test_session_id"
+        mock_session.url = "https://test-url.com"
+        mock_stripe_create.return_value = mock_session
+
         self.client.force_authenticate(self.user1)
         self.client.post(
             BORROWING_LIST_URL,
@@ -190,7 +197,13 @@ class TestBorrowingForUser(TestCase):
         book = Book.objects.get(pk=Borrowing.objects.last().book.id)
         self.assertEqual(book.inventory, 10)
 
-    def test_borrowing_return_again(self):
+    @patch("stripe.checkout.Session.create")
+    def test_borrowing_return_again(self, mock_stripe_create):
+        mock_session = Mock()
+        mock_session.id = "test_session_id"
+        mock_session.url = "https://test-url.com"
+        mock_stripe_create.return_value = mock_session
+
         self.client.force_authenticate(self.user1)
         self.client.post(
             BORROWING_LIST_URL,
