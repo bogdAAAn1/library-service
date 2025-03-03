@@ -1,8 +1,11 @@
+from django.db.models.signals import pre_save, post_save
 from django.test import TestCase
 from django.contrib.auth import get_user_model
 from django.urls import reverse
 from rest_framework.test import APIClient
 from rest_framework import status
+
+from book.signals import new_book_available
 
 
 def create_user(**params):
@@ -12,6 +15,10 @@ def create_user(**params):
 class PublicUserApiTests(TestCase):
 
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
         self.token_url = reverse("user:token_obtain_pair")
         self.create_user_url = reverse("user:register")
@@ -73,6 +80,10 @@ class PublicUserApiTests(TestCase):
 class PrivateUserApiTests(TestCase):
 
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.token_url = reverse("user:token_obtain_pair")
         self.me_url = reverse("user:manage")
 

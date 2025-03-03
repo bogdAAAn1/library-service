@@ -5,18 +5,24 @@ from decimal import Decimal
 import PIL
 from PIL import Image
 from django.contrib.auth import get_user_model
+from django.db.models.signals import pre_save, post_save
 from django.test import TestCase
 from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from book.models import Book
+from book.signals import new_book_available
 
 BOOK_URL = reverse("book:book-list")
 
 
 class UnauthenticatedUserTests(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
 
         self.book = Book.objects.create(
@@ -50,6 +56,10 @@ class UnauthenticatedUserTests(TestCase):
 
 class AuthenticatedUserTests(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             email="test@test.com", password="test_password"
@@ -83,6 +93,10 @@ class AuthenticatedUserTests(TestCase):
 
 class AdminUserTests(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             email="admin@test.com", password="admin_password", is_staff=True

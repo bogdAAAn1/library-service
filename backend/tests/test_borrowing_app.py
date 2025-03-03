@@ -1,6 +1,7 @@
 import json
 
 from django.contrib.auth import get_user_model
+from django.db.models.signals import pre_save, post_save
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.status import (
@@ -12,6 +13,7 @@ from rest_framework.status import (
 from rest_framework.test import APIClient
 
 from book.models import Book
+from book.signals import new_book_available
 from borrowing.models import Borrowing
 from payment.models import Payment
 
@@ -24,6 +26,10 @@ def parse_response(response):
 
 class TestBorrowingForUser(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
         self.book1 = Book.objects.create(
             title="test1",
@@ -208,6 +214,10 @@ class TestBorrowingForUser(TestCase):
 
 class TestBorrowingForAdmin(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
         self.book1 = Book.objects.create(
             title="test1",
