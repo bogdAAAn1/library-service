@@ -1,10 +1,11 @@
 import asyncio
 import os
-from datetime import datetime
-
+from datetime import datetime, timedelta
 
 from celery import shared_task
 from django.conf import settings
+from django.contrib.auth import get_user_model
+from django.contrib.messages.constants import SUCCESS
 from django.core.mail import EmailMessage
 from dotenv import load_dotenv
 from telegram import Bot
@@ -18,14 +19,11 @@ chat_id = os.getenv("TELEGRAM_CHAT_ID")
 sum_of_all_borrows = Borrowing.objects.count()
 sum_of_overdue_borrows = Borrowing.objects.filter(expected_return_date__lt=datetime.now()).count()
 
-
 @shared_task
-def morning_borrow_update() -> int:
+def morning_borrow_update():
     if sum_of_all_borrows > 0:
-        message = (f"Today we have {sum_of_all_borrows} borrowings.\n"
-                   "--------------\n"
-                   f"Total overdue {sum_of_overdue_borrows} books.\n"
-                   "--------------\n"
+        message = (f"Today we have {sum_of_all_borrows} borrowings.\n\n"
+                   f"Total overdue {sum_of_overdue_borrows} books.\n\n"
                    "Details report was send on corporate email.")
     else:
         message = f"Today we have no borrowings."
@@ -35,6 +33,7 @@ def morning_borrow_update() -> int:
         await bot.send_message(chat_id=chat_id, text=message)
 
     asyncio.run(send())
+    return "Success"
 
 @shared_task
 def send_borrows_to_email():
@@ -69,3 +68,34 @@ def send_notification_to_telegram(message):
         await bot.send_message(chat_id=chat_id, text=message)
 
     asyncio.run(send())
+
+@shared_task
+def send_user_almost_overdue_borrowing_notification():
+    User = get_user_model()
+    user_ids = [user.tg_chat for user in User.objects.all()]
+    one_day_ahead_expected_return_date = datetime.now() + timedelta(days=1)
+
+    for user_id in user_ids:
+        borrowings = Borrowing.objects.filter(
+            expected_return_date__lte=one_day_ahead_expected_return_date,
+            expected_return_date__gt=datetime.now(),
+            user__tg_chat=user_id
+        ).select_related('book')
+
+        for borrow in borrowings:
+            message = (
+                f"Borrow need to be returned:\n\n"
+                f"Book: {borrow.book.title}\n"
+                f"Author: {borrow.book.author}\n\n"
+                f"Borrow date: {borrow.borrow_date}\n"
+                f"Expected return date: {borrow.expected_return_date}\n"
+            )
+
+    async def send():
+        bot = Bot(token=token)
+        for user_id in user_ids:
+            await bot.send_message(chat_id=user_id, text=message)
+
+    asyncio.run(send())
+
+    return "Success"

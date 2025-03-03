@@ -29,10 +29,10 @@ async def my_borrowings(update: Update, context: CallbackContext) -> None:
 
     keyboard = [
         [
-            InlineKeyboardButton("Active borrow", callback_data="ACTIVE_BORROW"),
-            InlineKeyboardButton("Archive", callback_data="ARCHIVE"),
+            InlineKeyboardButton("Active borrow 📃", callback_data="ACTIVE_BORROW"),
+            InlineKeyboardButton("Archive 🗄", callback_data="ARCHIVE"),
         ],
-        [InlineKeyboardButton("Back", callback_data="WELCOME_POST")]
+        [InlineKeyboardButton("◀️ Back", callback_data="WELCOME_POST")]
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -79,9 +79,10 @@ async def active_borrow(update: Update, context: CallbackContext) -> None:
 
     if book_user_borrowed:
         await query.edit_message_text(
-            f"You have an active borrow!\n"
-            f"Book: {book_user_borrowed.book.title}\n"
-            f"Expected return date: {book_user_borrowed.expected_return_date}"
+            f"*You have an active borrow!*\n\n"
+            f"*Book*: {book_user_borrowed.book.title}\n"
+            f"*Expected return date*: {book_user_borrowed.expected_return_date}",
+            parse_mode="MARKDOWN",
         )
     else:
         await query.edit_message_text(f"No borrowing available.")
@@ -122,10 +123,12 @@ async def get_borrowing_archive(update: Update, context: CallbackContext) -> Non
     filtered_borrowings = [borrow for borrow in borrowing_list]
     for each_borrow in filtered_borrowings:
         await message.reply_text(
-            f"Borrow date: {each_borrow.borrow_date}\n"
-            f"Book author: {each_borrow.book.author}\n"
-            f"Book title: {each_borrow.book.title}\n"
-            f"Expected return date: {each_borrow.expected_return_date}\n"
+            f"*Borrow date:* {each_borrow.borrow_date}\n\n"
+            f"*Book author:* {each_borrow.book.author}\n"
+            f"*Book title:* {each_borrow.book.title}\n\n"
+            f"*Expected return date:* {each_borrow.expected_return_date}\n"
+            f"*Actual return date:* {each_borrow.actual_return_date}",
+            parse_mode="MARKDOWN"
         )
 
     await send_back_button(update.callback_query)
