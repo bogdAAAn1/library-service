@@ -37,7 +37,10 @@ from library_bot.user_interface.borrowings import (
     get_borrowing_archive,
 )
 
-from library_bot.user_interface.books import inline_book_search, show_book_search_hint
+from library_bot.user_interface.books import (
+    inline_book_search,
+    show_book_search_hint
+)
 
 from library_bot.user_interface.stages import *
 
@@ -54,12 +57,16 @@ logger = logging.getLogger(__name__)
 # Update telegram chat id of the user
 async def get_user_by_email(email):
     """Fetches a user from the database by their email."""
-    return await sync_to_async(lambda: User.objects.filter(email=email).first())()
+    return await sync_to_async(
+        lambda: User.objects.filter(email=email).first()
+    )()
 
 
 async def get_user_by_tg_chat(tg_chat):
     """Fetches a user from the database by their telegram chat id."""
-    return await sync_to_async(lambda: User.objects.filter(tg_chat=tg_chat).first())()
+    return await sync_to_async(
+        lambda: User.objects.filter(tg_chat=tg_chat).first()
+    )()
 
 
 async def update_user(user, tg_chat, date_joined):
@@ -69,7 +76,10 @@ async def update_user(user, tg_chat, date_joined):
     await sync_to_async(user.save)()
 
 
-async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def receive_email(
+        update: Update,
+        context: ContextTypes.DEFAULT_TYPE
+) -> None:
     """
     Checks if the email exists, updates the user's Telegram ID if found,
     and sends a confirmation or error message.
@@ -81,7 +91,9 @@ async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     if user:
         await update_user(user, user_id, datetime.now())
-        await update.message.reply_text("Your telegram account has been updated.")
+        await update.message.reply_text(
+            "Your telegram account has been updated."
+        )
         await welcome_post(update, context)
         return START_ROUTES
 

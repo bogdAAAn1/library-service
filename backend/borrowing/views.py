@@ -33,7 +33,10 @@ from schemas.borrowing_schema_decorator import (
 )
 
 
-def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
+def _filtering_borrowing_list(
+        borrowings: QuerySet,
+        is_active: str
+) -> QuerySet:
     if is_active == "true":
         borrowings = borrowings.filter(actual_return_date__isnull=True)
     if is_active == "false":
@@ -94,7 +97,8 @@ def borrowing_detail(request, pk):
         serializer = BorrowingRetrieveSerializer(borrowing)
         return Response(serializer.data, status=HTTP_200_OK)
     return Response(
-        {"message": "You can`t see this information"}, status=HTTP_403_FORBIDDEN
+        {"message": "You can`t see this information"},
+        status=HTTP_403_FORBIDDEN
     )
 
 
@@ -109,7 +113,9 @@ def borrowing_return(request, pk):
 
     if borrowing.actual_return_date is None:
 
-        payment = create_stripe_session(borrowing, request, datetime.now().date())
+        payment = create_stripe_session(
+            borrowing, request, datetime.now().date()
+        )
         message = borrowing.get_payment_message(datetime.now().date())
 
         return Response(
@@ -123,7 +129,9 @@ def borrowing_return(request, pk):
         )
 
     else:
-        return Response({"error": "Book already returned"}, status=HTTP_404_NOT_FOUND)
+        return Response(
+            {"error": "Book already returned"}, status=HTTP_404_NOT_FOUND
+        )
 
 
 def export_borrows_to_excel():

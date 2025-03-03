@@ -8,7 +8,9 @@ async def send_back_button(query) -> None:
     Sends a "Back" button to the user, allowing them to navigate back to the welcome screen.
     The message includes instructions to press the button below.
     """
-    keyboard = [[InlineKeyboardButton("◀️ Back", callback_data="WELCOME_POST")]]
+    keyboard = [
+        [InlineKeyboardButton("◀️ Back", callback_data="WELCOME_POST")]
+    ]
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await query.message.reply_text(
