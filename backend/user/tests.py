@@ -85,7 +85,9 @@ class PrivateUserApiTests(TestCase):
             self.token_url, {"email": "test@test.com", "password": "test123"}
         )
         self.access_token = res.data["access"]
-        self.client.credentials(HTTP_AUTHORIZATION=f"Bearer {self.access_token}")
+        self.client.credentials(
+            HTTP_AUTHORIZATION=f"Bearer {self.access_token}"
+        )
 
     def test_retrieve_profile_success(self):
         res = self.client.get(self.me_url)

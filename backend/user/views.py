@@ -3,7 +3,10 @@ from rest_framework import generics
 from rest_framework.permissions import IsAuthenticated
 from rest_framework_simplejwt.authentication import JWTAuthentication
 
-from schemas.user_schema_decorator import create_user_schema, manage_schema_view
+from schemas.user_schema_decorator import (
+    create_user_schema,
+    manage_schema_view
+)
 from user.serializers import UserSerializer
 
 
