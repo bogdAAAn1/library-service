@@ -32,7 +32,8 @@ def create_stripe_session(
                 "price_data": {
                     "currency": "usd",
                     "product_data": {
-                        "name": f"{borrowing.book.title} ({payment_type}: {total_payment}$)"
+                        "name": f"{borrowing.book.title} "
+                                f"({payment_type}: {total_payment}$)"
                     },
                     "unit_amount": total_price,
                 },
