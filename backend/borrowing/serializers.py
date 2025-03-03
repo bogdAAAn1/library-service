@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from rest_framework import serializers
 
 from borrowing.models import Borrowing
@@ -13,6 +15,9 @@ class BorrowingSerializer(serializers.ModelSerializer):
         if attrs["book"].inventory < 1:
             raise serializers.ValidationError("This book is not available")
 
+        if attrs["expected_return_date"] < datetime.now().date():
+            raise serializers.ValidationError("Invalid return date")
+
         return attrs
 
 
@@ -27,17 +32,4 @@ class BorrowingRetrieveSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Borrowing
-        fields = ("id", "borrow_date", "expected_return_date", "actual_return_date", "book", "payments")
-
-    def __init__(self, *args, **kwargs):
-        from payment.serializers import PaymentSerializer
-        self.fields["payments"] = PaymentSerializer(many=True, read_only=True)
-        super().__init__(*args, **kwargs)
-
-class BorrowingReturnSerializer(BorrowingRetrieveSerializer):
-    class Meta:
-        model = Borrowing
         fields = ("id", "borrow_date", "expected_return_date", "actual_return_date", "book")
-
-
-
