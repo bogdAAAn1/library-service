@@ -15,12 +15,7 @@ import logging
 from django.contrib.auth import get_user_model
 from dotenv import load_dotenv
 
-from telegram import (
-    Update,
-    InlineKeyboardButton,
-    InlineKeyboardMarkup
-
-)
+from telegram import Update, InlineKeyboardButton, InlineKeyboardMarkup
 from telegram.ext import (
     Application,
     CommandHandler,
@@ -30,7 +25,7 @@ from telegram.ext import (
     ContextTypes,
     MessageHandler,
     filters,
-    InlineQueryHandler
+    InlineQueryHandler,
 )
 from library_bot.user_interface.recommendations import send_recommend_book
 
@@ -39,13 +34,10 @@ from library_bot.user_interface.faq import get_faq
 from library_bot.user_interface.borrowings import (
     my_borrowings,
     active_borrow,
-    get_borrowing_archive
+    get_borrowing_archive,
 )
 
-from library_bot.user_interface.books import (
-    inline_book_search,
-    show_book_search_hint
-)
+from library_bot.user_interface.books import inline_book_search, show_book_search_hint
 
 from library_bot.user_interface.stages import *
 
@@ -58,20 +50,24 @@ logging.basicConfig(
 logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
-#Update telegram chat id of the user
+
+# Update telegram chat id of the user
 async def get_user_by_email(email):
     """Fetches a user from the database by their email."""
     return await sync_to_async(lambda: User.objects.filter(email=email).first())()
 
+
 async def get_user_by_tg_chat(tg_chat):
     """Fetches a user from the database by their telegram chat id."""
     return await sync_to_async(lambda: User.objects.filter(tg_chat=tg_chat).first())()
+
 
 async def update_user(user, tg_chat, date_joined):
     """Update data about user"""
     user.tg_chat = tg_chat
     user.date_joined = date_joined
     await sync_to_async(user.save)()
+
 
 async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
@@ -93,7 +89,8 @@ async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
         await update.message.reply_text("Email doesn't exist.")
         return ConversationHandler.END
 
-#Start function
+
+# Start function
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
     """
     Checks if the user exists based on Telegram chat ID.
@@ -114,7 +111,8 @@ async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
         await update.message.reply_text("Hi! Enter your email address.")
     return
 
-#Main post
+
+# Main post
 async def welcome_post(update: Update, context: CallbackContext) -> None:
     """
     Displays the main menu with borrowing, book search, payment, and FAQ options.
@@ -138,17 +136,18 @@ async def welcome_post(update: Update, context: CallbackContext) -> None:
             "Welcome to our greatest library.📚\n"
             "Here you can find your borrowings and see our books.🔎\n"
             "Go to FAQ to see the common questions.❓",
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
         )
     else:
         await update.message.reply_text(
             "Welcome to our greatest library.📚\n"
             "Here you can find your borrowings and pay it.🔎\n"
             "Go to FAQ to see the common questions.❓",
-            reply_markup=reply_markup
+            reply_markup=reply_markup,
         )
 
     return START_ROUTES
+
 
 def main():
     """
@@ -185,10 +184,11 @@ def main():
                 CallbackQueryHandler(active_borrow, pattern="ACTIVE_BORROW"),
                 CallbackQueryHandler(get_borrowing_archive, pattern="ARCHIVE"),
                 CallbackQueryHandler(show_book_search_hint, pattern="BOOKS"),
-                CallbackQueryHandler(send_recommend_book, pattern="RANDOM_BOOK_TO_READ"),
+                CallbackQueryHandler(
+                    send_recommend_book, pattern="RANDOM_BOOK_TO_READ"
+                ),
                 CallbackQueryHandler(get_faq, pattern="FAQ"),
                 CallbackQueryHandler(welcome_post, pattern="WELCOME_POST"),
-
             ],
         },
         fallbacks=[CommandHandler("start", start)],
@@ -197,6 +197,7 @@ def main():
     app.add_handler(inline_query_handler)
     app.add_handler(conv_handler)
     app.run_polling(allowed_updates=Update.ALL_TYPES)
+
 
 if __name__ == "__main__":
     main()

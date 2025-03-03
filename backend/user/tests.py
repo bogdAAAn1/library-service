@@ -63,7 +63,9 @@ class PublicUserApiTests(TestCase):
         self.assertEqual(res.status_code, status.HTTP_401_UNAUTHORIZED)
 
     def test_create_token_missing_field(self):
-        res = self.client.post(self.token_url, {"email": "test@test.com", "password": ""})
+        res = self.client.post(
+            self.token_url, {"email": "test@test.com", "password": ""}
+        )
         self.assertNotIn("access", res.data)
         self.assertEqual(res.status_code, status.HTTP_400_BAD_REQUEST)
 

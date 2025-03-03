@@ -11,14 +11,10 @@ class Payment(models.Model):
         FINE = "fine", "Fine"
 
     status = models.CharField(
-        max_length=7,
-        choices=PaymentStatus.choices,
-        default=PaymentStatus.PENDING
+        max_length=7, choices=PaymentStatus.choices, default=PaymentStatus.PENDING
     )
     type = models.CharField(
-        max_length=7,
-        choices=PaymentType.choices,
-        default=PaymentType.PAYMENT
+        max_length=7, choices=PaymentType.choices, default=PaymentType.PAYMENT
     )
     borrowing = models.ForeignKey(
         "borrowing.Borrowing", related_name="payments", on_delete=models.CASCADE

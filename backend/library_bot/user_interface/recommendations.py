@@ -14,6 +14,7 @@ async def get_random_book(update: Update, context: CallbackContext) -> Book:
     recommended_book = await sync_to_async(lambda: Book.objects.all()[random_index])()
     return recommended_book
 
+
 async def send_recommend_book(update: Update, context: CallbackContext) -> None:
     recommended_book = await get_random_book(update, context)
 

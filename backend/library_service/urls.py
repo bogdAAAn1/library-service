@@ -19,15 +19,17 @@ from django.conf.urls.static import static
 
 from django.contrib import admin
 from django.urls import path, include
-from drf_spectacular.views import SpectacularSwaggerView, SpectacularRedocView, \
-    SpectacularAPIView
+from drf_spectacular.views import (
+    SpectacularSwaggerView,
+    SpectacularRedocView,
+    SpectacularAPIView,
+)
 
 from borrowing.views import export_borrows_to_excel
 from library_service import settings
 
 urlpatterns = [
-    path('admin/', admin.site.urls),
-
+    path("admin/", admin.site.urls),
     path("api/payment/", include("payment.urls", namespace="payment")),
     path("api/user/", include("user.urls", namespace="user")),
     path("api/book/", include("book.urls", namespace="book")),

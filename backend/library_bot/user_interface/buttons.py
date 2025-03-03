@@ -1,9 +1,7 @@
-from telegram import (
-    InlineKeyboardButton,
-    InlineKeyboardMarkup
-)
+from telegram import InlineKeyboardButton, InlineKeyboardMarkup
 
 from library_bot.user_interface.stages import *
+
 
 async def send_back_button(query) -> None:
     """
@@ -14,8 +12,7 @@ async def send_back_button(query) -> None:
     reply_markup = InlineKeyboardMarkup(keyboard)
 
     await query.message.reply_text(
-        text="Press the button below to go back.",
-        reply_markup=reply_markup
+        text="Press the button below to go back.", reply_markup=reply_markup
     )
 
     return START_ROUTES

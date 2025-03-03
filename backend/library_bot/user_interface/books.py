@@ -8,7 +8,6 @@ from telegram import (
     Update,
     InlineKeyboardButton,
     InlineKeyboardMarkup,
-
 )
 from telegram.ext import ContextTypes
 
@@ -24,7 +23,9 @@ logging.getLogger("httpx").setLevel(logging.WARNING)
 logger = logging.getLogger(__name__)
 
 
-async def show_book_search_hint(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+async def show_book_search_hint(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     """This function handles the callback query for the 'BOOKS' button.
     It provides a hint to the user on how to search for books
     and includes a 'Back' button to return to the previous menu.
@@ -44,10 +45,11 @@ async def show_book_search_hint(update: Update, context: ContextTypes.DEFAULT_TY
     await query.edit_message_text(
         "To search books, type @project_librery_bot <book title>.\n"
         "Or press the button below to go back.",
-        reply_markup=reply_markup
+        reply_markup=reply_markup,
     )
 
     return START_ROUTES
+
 
 async def get_books():
     """This function retrieves all books from the database asynchronously.
@@ -56,7 +58,10 @@ async def get_books():
 
     return await sync_to_async(lambda: list(Book.objects.all()))()
 
-async def inline_book_search(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
+
+async def inline_book_search(
+    update: Update, context: ContextTypes.DEFAULT_TYPE
+) -> None:
     """The function handles inline search queries made by the user through the Telegram bot.
     It performs the following tasks:
 
@@ -81,7 +86,8 @@ async def inline_book_search(update: Update, context: ContextTypes.DEFAULT_TYPE)
     title of the book and its author.
 
     Sends the results back:
-    Finally, the function calls inline_query.answer(results) to send the filtered results back to the user."""
+    Finally, the function calls inline_query.answer(results) to send the filtered results back to the user.
+    """
 
     if update.inline_query:
         inline_query = update.inline_query
@@ -92,7 +98,9 @@ async def inline_book_search(update: Update, context: ContextTypes.DEFAULT_TYPE)
             return
 
         book_list = await get_books()
-        filtered_books = [book for book in book_list if query.lower() in book.title.lower()]
+        filtered_books = [
+            book for book in book_list if query.lower() in book.title.lower()
+        ]
         print(f"Filtered books: {filtered_books}")
 
         if not filtered_books:
@@ -100,7 +108,9 @@ async def inline_book_search(update: Update, context: ContextTypes.DEFAULT_TYPE)
                 InlineQueryResultArticle(
                     id=str(uuid4()),
                     title="No results found",
-                    input_message_content=InputTextMessageContent("No books match your search."),
+                    input_message_content=InputTextMessageContent(
+                        "No books match your search."
+                    ),
                 ),
             ]
         else:

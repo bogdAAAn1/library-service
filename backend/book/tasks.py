@@ -12,6 +12,7 @@ token = os.getenv("TELEGRAM_TOKEN")
 User = get_user_model()
 user_ids = [user.tg_chat for user in User.objects.all()]
 
+
 @shared_task
 def send_book_of_the_week():
 
@@ -33,6 +34,7 @@ def send_book_of_the_week():
 
     asyncio.run(send())
     return "Success"
+
 
 @shared_task
 def new_book_available_notification(message):

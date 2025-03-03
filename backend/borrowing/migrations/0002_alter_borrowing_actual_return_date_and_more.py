@@ -6,23 +6,23 @@ from django.db import migrations, models
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('borrowing', '0001_initial'),
+        ("borrowing", "0001_initial"),
     ]
 
     operations = [
         migrations.AlterField(
-            model_name='borrowing',
-            name='actual_return_date',
+            model_name="borrowing",
+            name="actual_return_date",
             field=models.DateField(blank=True, null=True),
         ),
         migrations.AlterField(
-            model_name='borrowing',
-            name='borrow_date',
+            model_name="borrowing",
+            name="borrow_date",
             field=models.DateField(auto_now_add=True),
         ),
         migrations.AlterField(
-            model_name='borrowing',
-            name='expected_return_date',
+            model_name="borrowing",
+            name="expected_return_date",
             field=models.DateField(),
         ),
     ]
