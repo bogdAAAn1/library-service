@@ -9,6 +9,8 @@ from rest_framework.response import Response
 
 from payment.models import Payment
 from payment.serializers import PaymentSerializer
+from schemas.payment_schema_decorator import payment_schema_view, payment_success_view_schema, \
+    payment_chancel_view_schema
 
 
 @extend_schema(tags=["payments"])
