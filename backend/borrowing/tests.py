@@ -52,7 +52,9 @@ class TestBorrowingForUser(TestCase):
         self.client.force_authenticate(self.user1)
         data = {"expected_return_date": "2025-04-28", "book": 1}
         self.client.post(BORROWING_LIST_URL, data)
-        url = reverse("borrowing:borrowings-detail", args=[Borrowing.objects.last().id])
+        url = reverse(
+            "borrowing:borrowings-detail",
+            args=[Borrowing.objects.last().id])
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTP_200_OK)
 
@@ -60,11 +62,15 @@ class TestBorrowingForUser(TestCase):
         data = {"expected_return_date": "2025-04-28", "book": 1}
         self.client.post(BORROWING_LIST_URL, data)
         self.client.force_authenticate(self.user2)
-        url = reverse("borrowing:borrowings-detail", args=[Borrowing.objects.last().id])
+        url = reverse(
+            "borrowing:borrowings-detail",
+            args=[Borrowing.objects.last().id]
+        )
         response = self.client.get(url)
         self.assertEqual(response.status_code, HTTP_403_FORBIDDEN)
         self.assertEqual(
-            response.content, b'{"message":"You don`t have access to this borrowing"}'
+            response.content,
+            b'{"message":"You don`t have access to this borrowing"}'
         )
 
 
