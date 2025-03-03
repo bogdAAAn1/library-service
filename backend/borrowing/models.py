@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from django.conf import settings
 from django.db import models
 
@@ -23,37 +25,37 @@ class Borrowing(models.Model):
         related_name="borrowings"
     )
 
-    def get_payment_type(self):
+    def get_payment_type(self, date_now: datetime.date):
         """return payment type"""
-        if self.actual_return_date and self.actual_return_date > self.expected_return_date:
+        if date_now > self.expected_return_date:
             return Payment.PaymentType.FINE
         return Payment.PaymentType.PAYMENT
 
-    def get_payment_message(self):
+    def get_payment_message(self, date_now: datetime.date):
         """return payment message"""
-        if self.get_payment_type() == Payment.PaymentType.FINE:
+        if self.get_payment_type(date_now) == Payment.PaymentType.FINE:
             return "The book is returned overdue. You need to pay a fine."
         return "The book is returned on time. Please pay the rental fee."
 
-    def get_total_rental_fee(self):
+    def get_total_rental_fee(self, date_now: datetime.date):
         """return total rental fee"""
-        if self.actual_return_date and self.borrow_date:
-            rental_days = (self.actual_return_date - self.borrow_date).days
+        if date_now and self.borrow_date:
+            rental_days = (date_now - self.borrow_date).days
             return max(rental_days, 1) * self.book.daily_fee
         return self.book.daily_fee
 
-    def get_late_fee(self):
+    def get_late_fee(self, date_now: datetime.date):
         """return late fee"""
         if self.actual_return_date and self.expected_return_date:
-            if self.actual_return_date > self.expected_return_date:
-                overdue_days = (self.actual_return_date - self.expected_return_date).days
+            if date_now > self.expected_return_date:
+                overdue_days = (date_now - self.expected_return_date).days
                 return overdue_days * self.book.daily_fee * FINE_MULTIPLIER
         return 0
 
-    def get_total_payment(self):
+    def get_total_payment(self, date_now: datetime.date):
         """return total payment"""
-        rental_fee = self.get_total_rental_fee()
-        late_fee = self.get_late_fee()
+        rental_fee = self.get_total_rental_fee(date_now)
+        late_fee = self.get_late_fee(date_now)
         return rental_fee + late_fee
 
     def __str__(self) -> str:

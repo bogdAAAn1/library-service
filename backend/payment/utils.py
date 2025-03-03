@@ -1,3 +1,5 @@
+from datetime import datetime
+
 import stripe
 from django.conf import settings
 from django.db import transaction
@@ -10,9 +12,9 @@ stripe.api_key = settings.STRIPE_SECRET_KEY
 
 
 @transaction.atomic
-def create_stripe_session(borrowing: Borrowing, request) -> Payment:
-    payment_type = borrowing.get_payment_type()
-    total_payment = borrowing.get_total_payment()
+def create_stripe_session(borrowing: Borrowing, request, date_now: datetime.date) -> Payment:
+    payment_type = borrowing.get_payment_type(date_now)
+    total_payment = borrowing.get_total_payment(date_now)
     total_price = int(total_payment * 100)
 
     success_url = request.build_absolute_uri(reverse("payment:payment-success")) + "?session_id={CHECKOUT_SESSION_ID}"

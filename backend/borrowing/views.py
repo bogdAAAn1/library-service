@@ -2,20 +2,18 @@ from datetime import datetime
 from io import BytesIO
 
 import pandas as pd
-from django.contrib.auth.decorators import permission_required
+
 from django.db.models import QuerySet
 from django.shortcuts import get_object_or_404
 from django.db.models import F
 
-from drf_spectacular.utils import extend_schema
-from rest_framework.decorators import api_view, , permission_classes
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST,
-    HTTP_404_NOT_FOUND
+    HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN
 )
 
 from book.models import Book
@@ -24,7 +22,6 @@ from borrowing.serializers import (
     BorrowingSerializer,
     BorrowingListSerializer,
     BorrowingRetrieveSerializer,
-    BorrowingReturnSerializer,
 )
 from payment.utils import create_stripe_session
 from schemas.borrowing_schema_decorator import (
@@ -79,15 +76,18 @@ def borrowing_list(request):
         return Response(serializer.data, status=HTTP_201_CREATED)
 
 
-
-
 @borrowing_detail_get_schema()
 @api_view(["GET"])
 @permission_classes([IsAuthenticated, ])
 def borrowing_detail(request, pk):
     borrowing = Borrowing.objects.get(pk=pk)
-    serializer = BorrowingRetrieveSerializer(borrowing)
-    return Response(serializer.data, status=HTTP_200_OK)
+    if request.user == borrowing.user or request.user.is_staff:
+        serializer = BorrowingRetrieveSerializer(borrowing)
+        return Response(serializer.data, status=HTTP_200_OK)
+    return Response(
+        {"message": "You can`t see this information"},
+        status=HTTP_403_FORBIDDEN
+    )
 
 
 @borrowing_detail_return_post_schema()
@@ -96,17 +96,16 @@ def borrowing_detail(request, pk):
 def borrowing_return(request, pk):
     borrowing = get_object_or_404(Borrowing, pk=pk)
 
+    if request.user != borrowing.user:
+        return Response(
+            {"error": "You can`t do this"},
+            HTTP_403_FORBIDDEN
+        )
+
     if borrowing.actual_return_date is None:
-        borrowing.actual_return_date = datetime.now().date()
-        borrowing.save()
 
-        book = borrowing.book
-        book.inventory += 1
-        book.save()
-
-
-        payment = create_stripe_session(borrowing, request)
-        message = borrowing.get_payment_message()
+        payment = create_stripe_session(borrowing, request, datetime.now().date())
+        message = borrowing.get_payment_message(datetime.now().date())
 
         return Response({
             "message": message,
@@ -116,10 +115,10 @@ def borrowing_return(request, pk):
         }, status=HTTP_200_OK)
 
     else:
-        return Response({"error": "Book already returned"}, status=HTTP_404_NOT_FOUND)
-
-
-
+        return Response(
+            {"error": "Book already returned"},
+            status=HTTP_404_NOT_FOUND
+        )
 
 
 def export_borrows_to_excel():
