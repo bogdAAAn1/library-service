@@ -5,13 +5,17 @@ from book.models import Book
 
 
 class BookFilter(django_filters.FilterSet):
-    id = django_filters.CharFilter(method="search_by_ids")
+    book_id = django_filters.CharFilter(field_name="id", method="search_by_ids")
     author = django_filters.CharFilter(method="search_by_authors")
 
     daily_fee = django_filters.NumberFilter(field_name="daily_fee")
 
-    min_fee = django_filters.NumberFilter(field_name="daily_fee", lookup_expr="gte")
-    max_fee = django_filters.NumberFilter(field_name="daily_fee", lookup_expr="lte")
+    min_fee = django_filters.NumberFilter(
+        field_name="daily_fee", lookup_expr="gte"
+    )
+    max_fee = django_filters.NumberFilter(
+        field_name="daily_fee", lookup_expr="lte"
+    )
 
     class Meta:
         model = Book
