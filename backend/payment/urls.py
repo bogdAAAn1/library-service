@@ -6,7 +6,7 @@ from payment.views import payment_success_view, payment_cancel_view, PaymentView
 app_name = "payment"
 
 router = DefaultRouter()
-router.register("payment", PaymentViewSet, basename="payment")
+router.register("", PaymentViewSet, basename="payment")
 
 urlpatterns = [
     path("", include(router.urls)),
