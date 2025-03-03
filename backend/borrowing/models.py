@@ -15,9 +15,7 @@ class Borrowing(models.Model):
     expected_return_date = models.DateField()
     actual_return_date = models.DateField(null=True, blank=True)
     book = models.ForeignKey(
-        Book,
-        on_delete=models.CASCADE,
-        related_name="borrowings"
+        Book, on_delete=models.CASCADE, related_name="borrowings"
     )
     user = models.ForeignKey(
         settings.AUTH_USER_MODEL,
@@ -59,4 +57,7 @@ class Borrowing(models.Model):
         return rental_fee + late_fee
 
     def __str__(self) -> str:
-        return f"Borrowing by {self.user} - Book: {self.book.title} on {self.borrow_date}"
+        return (
+            f"Borrowing by {self.user} - "
+            f"Book: {self.book.title} on {self.borrow_date}"
+        )

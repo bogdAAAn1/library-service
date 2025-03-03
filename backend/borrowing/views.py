@@ -13,7 +13,8 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
-    HTTP_404_NOT_FOUND, HTTP_403_FORBIDDEN
+    HTTP_404_NOT_FOUND,
+    HTTP_403_FORBIDDEN,
 )
 
 from book.models import Book
@@ -32,7 +33,10 @@ from schemas.borrowing_schema_decorator import (
 )
 
 
-def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
+def _filtering_borrowing_list(
+        borrowings: QuerySet,
+        is_active: str
+) -> QuerySet:
     if is_active == "true":
         borrowings = borrowings.filter(actual_return_date__isnull=True)
     if is_active == "false":
@@ -44,7 +48,11 @@ def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
 @borrowing_list_get_schema()
 @borrowing_list_post_schema()
 @api_view(["GET", "POST"])
-@permission_classes([IsAuthenticated, ])
+@permission_classes(
+    [
+        IsAuthenticated,
+    ]
+)
 def borrowing_list(request):
     if request.method == "GET":
         borrowing = Borrowing.objects.all()
@@ -78,7 +86,11 @@ def borrowing_list(request):
 
 @borrowing_detail_get_schema()
 @api_view(["GET"])
-@permission_classes([IsAuthenticated, ])
+@permission_classes(
+    [
+        IsAuthenticated,
+    ]
+)
 def borrowing_detail(request, pk):
     borrowing = Borrowing.objects.get(pk=pk)
     if request.user == borrowing.user or request.user.is_staff:
@@ -97,27 +109,28 @@ def borrowing_return(request, pk):
     borrowing = get_object_or_404(Borrowing, pk=pk)
 
     if request.user != borrowing.user:
-        return Response(
-            {"error": "You can`t do this"},
-            HTTP_403_FORBIDDEN
-        )
+        return Response({"error": "You can`t do this"}, HTTP_403_FORBIDDEN)
 
     if borrowing.actual_return_date is None:
 
-        payment = create_stripe_session(borrowing, request, datetime.now().date())
+        payment = create_stripe_session(
+            borrowing, request, datetime.now().date()
+        )
         message = borrowing.get_payment_message(datetime.now().date())
 
-        return Response({
-            "message": message,
-            "payment_url": payment.session_url,
-            "payment_type": payment.type,
-            "total_payment": float(payment.money_to_pay)
-        }, status=HTTP_200_OK)
+        return Response(
+            {
+                "message": message,
+                "payment_url": payment.session_url,
+                "payment_type": payment.type,
+                "total_payment": float(payment.money_to_pay),
+            },
+            status=HTTP_200_OK,
+        )
 
     else:
         return Response(
-            {"error": "Book already returned"},
-            status=HTTP_404_NOT_FOUND
+            {"error": "Book already returned"}, status=HTTP_404_NOT_FOUND
         )
 
 

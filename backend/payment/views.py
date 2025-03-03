@@ -9,8 +9,11 @@ from rest_framework.response import Response
 
 from payment.models import Payment
 from payment.serializers import PaymentSerializer
-from schemas.payment_schema_decorator import payment_schema_view, payment_success_view_schema, \
-    payment_chancel_view_schema
+from schemas.payment_schema_decorator import (
+    payment_schema_view,
+    payment_success_view_schema,
+    payment_chancel_view_schema,
+)
 
 
 @extend_schema(tags=["payments"])
@@ -41,12 +44,21 @@ def payment_success_view(request):
     if session.payment_status == "paid":
         payment.status = Payment.PaymentStatus.PAID
         payment.save()
-        return Response({"message": "Payment successful!"}, status=status.HTTP_200_OK)
+        return Response(
+            {"message": "Payment successful!"},
+            status=status.HTTP_200_OK
+        )
 
-    return Response({"error": "Payment failed!"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        {"error": "Payment failed!"},
+        status=status.HTTP_400_BAD_REQUEST
+    )
 
 
 @payment_chancel_view_schema()
 @api_view(["GET"])
 def payment_cancel_view(request):
-    return Response({"message": "Payment was cancelled!"}, status=status.HTTP_400_BAD_REQUEST)
+    return Response(
+        {"message": "Payment was cancelled!"},
+        status=status.HTTP_400_BAD_REQUEST
+    )

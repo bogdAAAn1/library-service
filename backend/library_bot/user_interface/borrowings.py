@@ -29,15 +29,16 @@ async def my_borrowings(update: Update, context: CallbackContext) -> None:
 
     keyboard = [
         [
-            InlineKeyboardButton("Active borrow", callback_data="ACTIVE_BORROW"),
-            InlineKeyboardButton("Archive", callback_data="ARCHIVE"),
+            InlineKeyboardButton("Active borrow 📃", callback_data="ACTIVE_BORROW"),
+            InlineKeyboardButton("Archive 🗄", callback_data="ARCHIVE"),
         ],
-        [InlineKeyboardButton("Back", callback_data="WELCOME_POST")]
+        [InlineKeyboardButton("◀️ Back", callback_data="WELCOME_POST")],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
     await query.edit_message_text(
-        text="Here you can see your active borrowings or books you already returned.", reply_markup=reply_markup
+        text="Here you can see your active borrowings or books you already returned.",
+        reply_markup=reply_markup,
     )
     return START_ROUTES
 
@@ -54,7 +55,8 @@ async def get_overdue_borrow(user_id):
     return await sync_to_async(
         lambda: Borrowing.objects.filter(
             expected_return_date__lt=datetime.now(), user__tg_chat=user_id
-        ).select_related('book')
+        )
+        .select_related("book")
         .first()
     )()
 
@@ -79,14 +81,17 @@ async def active_borrow(update: Update, context: CallbackContext) -> None:
 
     if book_user_borrowed:
         await query.edit_message_text(
-            f"You have an active borrow!\n"
-            f"Book: {book_user_borrowed.book.title}\n"
-            f"Expected return date: {book_user_borrowed.expected_return_date}"
+            f"*You have an active borrow!*\n\n"
+            f"*Book*: {book_user_borrowed.book.title}\n"
+            f"*Expected return date*: "
+            f"{book_user_borrowed.expected_return_date}",
+            parse_mode="MARKDOWN",
         )
     else:
-        await query.edit_message_text(f"No borrowing available.")
+        await query.edit_message_text("No borrowing available.")
 
     await send_back_button(update.callback_query)
+
 
 ########Archive########
 async def get_borrows_list(user_id):
@@ -99,13 +104,16 @@ async def get_borrows_list(user_id):
     return await sync_to_async(
         lambda: list(
             Borrowing.objects.filter(
-                expected_return_date__lt=datetime.now(),
-                user__tg_chat=user_id
-            ).select_related('book')
+                expected_return_date__lt=datetime.now(), user__tg_chat=user_id
+            ).select_related("book")
         )
     )()
 
-async def get_borrowing_archive(update: Update, context: CallbackContext) -> None:
+
+async def get_borrowing_archive(
+        update: Update,
+        context: CallbackContext
+) -> None:
     """
     Handles the request to view the borrowing archive of a user.
     It retrieves the list of past borrowings for the user and displays details
@@ -122,10 +130,12 @@ async def get_borrowing_archive(update: Update, context: CallbackContext) -> Non
     filtered_borrowings = [borrow for borrow in borrowing_list]
     for each_borrow in filtered_borrowings:
         await message.reply_text(
-            f"Borrow date: {each_borrow.borrow_date}\n"
-            f"Book author: {each_borrow.book.author}\n"
-            f"Book title: {each_borrow.book.title}\n"
-            f"Expected return date: {each_borrow.expected_return_date}\n"
+            f"*Borrow date:* {each_borrow.borrow_date}\n\n"
+            f"*Book author:* {each_borrow.book.author}\n"
+            f"*Book title:* {each_borrow.book.title}\n\n"
+            f"*Expected return date:* {each_borrow.expected_return_date}\n"
+            f"*Actual return date:* {each_borrow.actual_return_date}",
+            parse_mode="MARKDOWN",
         )
 
     await send_back_button(update.callback_query)

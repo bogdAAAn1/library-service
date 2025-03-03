@@ -6,7 +6,9 @@ from django.urls import reverse
 from rest_framework.status import (
     HTTP_201_CREATED,
     HTTP_200_OK,
-    HTTP_403_FORBIDDEN, HTTP_404_NOT_FOUND
+    HTTP_404_NOT_FOUND,
+    HTTP_401_UNAUTHORIZED,
+    HTTP_403_FORBIDDEN,
 )
 from rest_framework.test import APIClient
 
@@ -39,18 +41,15 @@ class TestBorrowingForUser(TestCase):
             daily_fee=10,
         )
         self.user1 = get_user_model().objects.create_user(
-            email="user1@test.com",
-            password="testpassword"
+            email="user1@test.com", password="testpassword"
         )
         self.user2 = get_user_model().objects.create_user(
-            email="user2@test.com",
-            password="testpassword"
+            email="user2@test.com", password="testpassword"
         )
         self.data = {
             "expected_return_date": "2025-04-28",
             "book": 1
         }
-
 
     def test_create_borrowing(self):
         self.client.force_authenticate(self.user1)
@@ -114,6 +113,7 @@ class TestBorrowingForUser(TestCase):
             "borrowing:borrowings-detail",
             args=[Borrowing.objects.last().id]
         )
+
         response = self.client.get(url)
         parsed_data = parse_response(response)
         self.assertEqual(response.status_code, HTTP_200_OK)
@@ -129,6 +129,7 @@ class TestBorrowingForUser(TestCase):
             BORROWING_LIST_URL,
             self.data
         )
+
         self.client.force_authenticate(self.user2)
         url = reverse(
             "borrowing:borrowings-detail",

@@ -20,7 +20,7 @@ book_filter_list_schema = {
             required=False,
         ),
         OpenApiParameter(
-            "id",
+            "book_id",
             OpenApiTypes.NUMBER,
             OpenApiParameter.QUERY,
             description="Comma separated list of book's ids to filter",
