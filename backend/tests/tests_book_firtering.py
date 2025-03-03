@@ -186,7 +186,7 @@ class UnauthenticatedUserTests(TestCase):
         self.assertEqual(res_all.data, books_data)
 
         res_page = self.client.get(BOOK_URL + "?limit=2")
-        print(res_page)
+
         self.assertEqual(len(res_page.data["results"]), 2)
 
 
