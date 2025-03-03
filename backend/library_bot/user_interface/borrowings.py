@@ -83,11 +83,12 @@ async def active_borrow(update: Update, context: CallbackContext) -> None:
         await query.edit_message_text(
             f"*You have an active borrow!*\n\n"
             f"*Book*: {book_user_borrowed.book.title}\n"
-            f"*Expected return date*: {book_user_borrowed.expected_return_date}",
+            f"*Expected return date*: "
+            f"{book_user_borrowed.expected_return_date}",
             parse_mode="MARKDOWN",
         )
     else:
-        await query.edit_message_text(f"No borrowing available.")
+        await query.edit_message_text("No borrowing available.")
 
     await send_back_button(update.callback_query)
 
@@ -109,7 +110,10 @@ async def get_borrows_list(user_id):
     )()
 
 
-async def get_borrowing_archive(update: Update, context: CallbackContext) -> None:
+async def get_borrowing_archive(
+        update: Update,
+        context: CallbackContext
+) -> None:
     """
     Handles the request to view the borrowing archive of a user.
     It retrieves the list of past borrowings for the user and displays details

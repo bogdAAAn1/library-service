@@ -31,7 +31,7 @@ def morning_borrow_update():
             "Details report was send on corporate email."
         )
     else:
-        message = f"Today we have no borrowings."
+        message = "Today we have no borrowings."
 
     async def send():
         bot = Bot(token=token)
@@ -45,15 +45,18 @@ def morning_borrow_update():
 def send_borrows_to_email():
     detailed_borrows_document = export_borrows_to_excel()
     email = EmailMessage(
-        subject=f"Borrowing-daily-report-{datetime.now().strftime('%Y-%m-%d')}",
+        subject=f"Borrowing-daily-report-"
+                f"{datetime.now().strftime('%Y-%m-%d')}",
         body="Dear colleagues.\n"
         "Attached you will find the daily borrowing report for today.\n"
         "Here are the key details:\n"
         f"Total number of borrowings: {sum_of_all_borrows}.\n"
         f"Number of overdue borrowings: {sum_of_overdue_borrows}\n"
-        "This report includes all relevant data regarding borrowings, including borrow date, "
+        "This report includes all relevant data regarding borrowings,\n"
+        "including borrow date, "
         "expected return date, and actual return date.\n"
-        "If you have any questions or need further information, please don't hesitate to reach out.",
+        "If you have any questions or need further information,\n"
+        "please don't hesitate to reach out.",
         from_email=settings.EMAIL_HOST_USER,
         to=[settings.RECIPIENT_ADDRESS],
     )
