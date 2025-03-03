@@ -32,6 +32,7 @@ from telegram.ext import (
     filters,
     InlineQueryHandler
 )
+from library_bot.user_interface.recommendations import send_recommend_book
 
 from library_bot.user_interface.faq import get_faq
 
@@ -90,7 +91,7 @@ async def receive_email(update: Update, context: ContextTypes.DEFAULT_TYPE) -> N
 
     else:
         await update.message.reply_text("Email doesn't exist.")
-        return CommandHandler.END
+        return ConversationHandler.END
 
 #Start function
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
@@ -123,10 +124,11 @@ async def welcome_post(update: Update, context: CallbackContext) -> None:
 
     keyboard = [
         [
-            InlineKeyboardButton("My borrowings", callback_data="MY_BORROWINGS"),
-            InlineKeyboardButton("Books", callback_data="BOOKS"),
+            InlineKeyboardButton("My borrowings ", callback_data="MY_BORROWINGS"),
+            InlineKeyboardButton("Books 📕", callback_data="BOOKS"),
         ],
-        [InlineKeyboardButton("FAQ", callback_data="FAQ")],
+        [InlineKeyboardButton("What to read 📖", callback_data="RANDOM_BOOK_TO_READ")],
+        [InlineKeyboardButton("FAQ ❓", callback_data="FAQ")],
     ]
 
     reply_markup = InlineKeyboardMarkup(keyboard)
@@ -134,7 +136,7 @@ async def welcome_post(update: Update, context: CallbackContext) -> None:
     if query and query.message:
         await query.message.edit_text(
             "Welcome to our greatest library.📚\n"
-            "Here you can find your borrowings and pay it.🔎\n"
+            "Here you can find your borrowings and see our books.🔎\n"
             "Go to FAQ to see the common questions.❓",
             reply_markup=reply_markup
         )
@@ -183,6 +185,7 @@ def main():
                 CallbackQueryHandler(active_borrow, pattern="ACTIVE_BORROW"),
                 CallbackQueryHandler(get_borrowing_archive, pattern="ARCHIVE"),
                 CallbackQueryHandler(show_book_search_hint, pattern="BOOKS"),
+                CallbackQueryHandler(send_recommend_book, pattern="RANDOM_BOOK_TO_READ"),
                 CallbackQueryHandler(get_faq, pattern="FAQ"),
                 CallbackQueryHandler(welcome_post, pattern="WELCOME_POST"),
 
