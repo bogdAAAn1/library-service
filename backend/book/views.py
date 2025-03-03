@@ -28,7 +28,7 @@ class BookViewSet(
     filter_backends = [DjangoFilterBackend, SearchFilter, OrderingFilter]
     search_fields = ["title", "cover", "inventory"]
     filterset_class = BookFilter
-    ordering_fields = ["title", "author", "inventory", "daily_fee"]
+    ordering_fields = ["id", "title", "author", "inventory", "daily_fee"]
     ordering = ["id"]
     permission_classes = [IsAdminUser]
 
