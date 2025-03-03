@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django_filters.rest_framework import DjangoFilterBackend
 from drf_spectacular.utils import extend_schema, extend_schema_view
 from rest_framework import mixins, status
@@ -31,6 +30,12 @@ class BookViewSet(
     filterset_class = BookFilter
     ordering_fields = ["title", "author", "inventory", "daily_fee"]
     ordering = ["id"]
+    permission_classes = [IsAdminUser]
+
+    def get_permissions(self):
+        if self.action in ["list", "retrieve"]:
+            return []
+        return [permission() for permission in self.permission_classes]
 
     def get_serializer_class(self):
 
