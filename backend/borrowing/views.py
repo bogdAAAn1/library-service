@@ -1,13 +1,10 @@
 from datetime import datetime
-from http.client import responses
 from io import BytesIO
 
 import pandas as pd
 from django.contrib.auth.decorators import permission_required
 from django.db.models import QuerySet
-from django.http import HttpResponseRedirect
-from django.shortcuts import get_object_or_404, redirect
-from django.http import HttpResponse, JsonResponse
+from django.shortcuts import get_object_or_404
 from django.db.models import F
 
 from rest_framework.decorators import api_view, permission_classes
@@ -16,7 +13,8 @@ from rest_framework.response import Response
 from rest_framework.status import (
     HTTP_200_OK,
     HTTP_201_CREATED,
-    HTTP_400_BAD_REQUEST, HTTP_404_NOT_FOUND
+    HTTP_400_BAD_REQUEST,
+    HTTP_404_NOT_FOUND
 )
 
 from book.models import Book
@@ -27,7 +25,7 @@ from borrowing.serializers import (
     BorrowingRetrieveSerializer,
     BorrowingReturnSerializer
 )
-from payment.views import create_stripe_session
+from payment.utils import create_stripe_session
 
 
 def _filtering_borrowing_list(borrowings: QuerySet, is_active: str) -> QuerySet:
@@ -63,19 +61,14 @@ def borrowing_list(request):
     if request.method == "POST":
         serializer = BorrowingSerializer(data=request.data)
         serializer.is_valid(raise_exception=True)
-        borrowing = serializer.save(user=request.user)
+        serializer.save(user=request.user)
 
         book = Book.objects.get(id=serializer.data.get("book"))
         book.inventory -= 1
         book.save()
 
-        payment = create_stripe_session(borrowing, request)
+        return Response(serializer.data, status=HTTP_201_CREATED)
 
-        response_data = serializer.data
-        response_data["payment_url"] = payment.session_url
-        response_data["payment_status"] = payment.status
-
-        return Response(response_data, status=HTTP_201_CREATED)
 
 
 @api_view(["GET"])
@@ -93,15 +86,26 @@ def borrowing_return(request, pk):
 
     if borrowing.actual_return_date is None:
         borrowing.actual_return_date = datetime.now().date()
+        borrowing.save()
 
         book = borrowing.book
         book.inventory += 1
         book.save()
 
-        borrowing.save()
-        return Response(BorrowingReturnSerializer(borrowing).data, status=HTTP_200_OK)
+
+        payment = create_stripe_session(borrowing, request)
+        message = borrowing.get_payment_message()
+
+        return Response({
+            "message": message,
+            "payment_url": payment.session_url,
+            "payment_type": payment.type,
+            "total_payment": float(payment.money_to_pay)
+        }, status=HTTP_200_OK)
+
     else:
-        return Response(status=HTTP_404_NOT_FOUND)
+        return Response({"error": "Book already returned"}, status=HTTP_404_NOT_FOUND)
+
 
 
 
@@ -123,5 +127,3 @@ def export_borrows_to_excel():
     file_buffer.seek(0)
 
     return file_buffer
-
-
