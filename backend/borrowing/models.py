@@ -55,3 +55,6 @@ class Borrowing(models.Model):
         rental_fee = self.get_total_rental_fee()
         late_fee = self.get_late_fee()
         return rental_fee + late_fee
+
+    def __str__(self) -> str:
+        return f"Borrowing by {self.user} - Book: {self.book.title} on {self.borrow_date}"
