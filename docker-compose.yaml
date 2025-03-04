@@ -38,6 +38,7 @@ services:
         condition: service_healthy
     volumes:
       - ./backend:/library-service/backend
+      - media:/library-service/backend/media
     networks:
       - library-network
     healthcheck:
@@ -125,6 +126,8 @@ services:
 
 volumes:
   postgres-library_data:
+    driver: local
+  media:
     driver: local
 
 networks:
