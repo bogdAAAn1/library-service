@@ -53,7 +53,7 @@ async def get_overdue_borrow(user_id):
 
     return await sync_to_async(
         lambda: Borrowing.objects.filter(
-            expected_return_date__lt=datetime.now(), user__tg_chat=user_id
+            expected_return_date__lte=datetime.now().date(), user__tg_chat=user_id
         ).select_related('book')
         .first()
     )()

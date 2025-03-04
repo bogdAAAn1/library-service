@@ -5,7 +5,6 @@ from datetime import datetime, timedelta
 from celery import shared_task
 from django.conf import settings
 from django.contrib.auth import get_user_model
-from django.contrib.messages.constants import SUCCESS
 from django.core.mail import EmailMessage
 from dotenv import load_dotenv
 from telegram import Bot
@@ -16,17 +15,23 @@ from borrowing.views import export_borrows_to_excel
 load_dotenv()
 token = os.getenv("TELEGRAM_TOKEN")
 chat_id = os.getenv("TELEGRAM_CHAT_ID")
-sum_of_all_borrows = Borrowing.objects.count()
-sum_of_overdue_borrows = Borrowing.objects.filter(expected_return_date__lt=datetime.now()).count()
+
 
 @shared_task
 def morning_borrow_update():
+    sum_of_all_borrows = Borrowing.objects.count()
+    sum_of_overdue_borrows = Borrowing.objects.filter(
+        expected_return_date__lt=datetime.now()
+    ).count()
+
     if sum_of_all_borrows > 0:
-        message = (f"Today we have {sum_of_all_borrows} borrowings.\n\n"
-                   f"Total overdue {sum_of_overdue_borrows} books.\n\n"
-                   "Details report was send on corporate email.")
+        message = (
+            f"Today we have {sum_of_all_borrows} borrowings.\n\n"
+            f"Total overdue {sum_of_overdue_borrows} books.\n\n"
+            "Details report was send on corporate email."
+        )
     else:
-        message = f"Today we have no borrowings."
+        message = "Today we have no borrowings."
 
     async def send():
         bot = Bot(token=token)
@@ -35,19 +40,28 @@ def morning_borrow_update():
     asyncio.run(send())
     return "Success"
 
+
 @shared_task
 def send_borrows_to_email():
+    sum_of_all_borrows = Borrowing.objects.count()
+    sum_of_overdue_borrows = Borrowing.objects.filter(
+        expected_return_date__lt=datetime.now()
+    ).count()
+
     detailed_borrows_document = export_borrows_to_excel()
     email = EmailMessage(
-        subject=f"Borrowing-daily-report-{datetime.now().strftime('%Y-%m-%d')}",
+        subject=f"Borrowing-daily-report-"
+                f"{datetime.now().strftime('%Y-%m-%d')}",
         body="Dear colleagues.\n"
-             "Attached you will find the daily borrowing report for today.\n"
-             "Here are the key details:\n"
-             f"Total number of borrowings: {sum_of_all_borrows}.\n"
-             f"Number of overdue borrowings: {sum_of_overdue_borrows}\n"
-             "This report includes all relevant data regarding borrowings, including borrow date, "
-             "expected return date, and actual return date.\n"
-             "If you have any questions or need further information, please don't hesitate to reach out.",
+        "Attached you will find the daily borrowing report for today.\n"
+        "Here are the key details:\n"
+        f"Total number of borrowings: {sum_of_all_borrows}.\n"
+        f"Number of overdue borrowings: {sum_of_overdue_borrows}\n"
+        "This report includes all relevant data regarding borrowings,\n"
+        "including borrow date, "
+        "expected return date, and actual return date.\n"
+        "If you have any questions or need further information,\n"
+        "please don't hesitate to reach out.",
         from_email=settings.EMAIL_HOST_USER,
         to=[settings.RECIPIENT_ADDRESS],
     )
@@ -55,11 +69,12 @@ def send_borrows_to_email():
     email.attach(
         f"borrowing-daily-report-{datetime.now().strftime('%Y-%m-%d')}.xlsx",
         detailed_borrows_document.read(),
-        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     )
 
     email.send()
     return "Success"
+
 
 @shared_task
 def send_notification_to_telegram(message):
@@ -79,8 +94,8 @@ def send_user_almost_overdue_borrowing_notification():
         borrowings = Borrowing.objects.filter(
             expected_return_date__lte=one_day_ahead_expected_return_date,
             expected_return_date__gt=datetime.now(),
-            user__tg_chat=user_id
-        ).select_related('book')
+            user__tg_chat=user_id,
+        ).select_related("book")
 
         for borrow in borrowings:
             message = (

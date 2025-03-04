@@ -36,7 +36,7 @@ class UserManager(BaseUserManager):
 class User(AbstractUser):
     username = None
     email = models.EmailField(unique=True)
-    tg_chat = models.IntegerField(null=True, blank=True, unique=True)
+    tg_chat = models.BigIntegerField(null=True, blank=True, unique=True)
 
     objects = UserManager()
 

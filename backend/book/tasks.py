@@ -2,6 +2,7 @@ import asyncio
 import os
 import random
 
+from asgiref.sync import sync_to_async
 from celery import shared_task
 from django.contrib.auth import get_user_model
 from telegram import Bot
@@ -10,7 +11,10 @@ from book.models import Book
 token = os.getenv("TELEGRAM_TOKEN")
 
 User = get_user_model()
-user_ids = [user.tg_chat for user in User.objects.all()]
+
+@sync_to_async
+def get_user_ids():
+    return [user.tg_chat for user in User.objects.all()]
 
 @shared_task
 def send_book_of_the_week():
@@ -28,16 +32,19 @@ def send_book_of_the_week():
 
     async def send():
         bot = Bot(token=token)
+        user_ids = await get_user_ids()
         for user_id in user_ids:
             await bot.send_message(chat_id=user_id, text=message)
 
     asyncio.run(send())
     return "Success"
 
+
 @shared_task
 def new_book_available_notification(message):
     async def send():
         bot = Bot(token=token)
+        user_ids = await get_user_ids()
         for user_id in user_ids:
             await bot.send_message(chat_id=user_id, text=message)
 
