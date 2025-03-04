@@ -1,0 +1,296 @@
+[
+{
+    "model": "book.book",
+    "pk": 1,
+    "fields": {
+        "title": "Ukrainian Cuisine in 70 Dishes",
+        "author": "Ievhen Klopotenko",
+        "cover": "Hard",
+        "inventory": 2,
+        "daily_fee": "3.20",
+        "image": "uploads/movies/ukrainian-cuisine-in-70-dishes-d3120509-0b6d-4a1c-a455-9e3068b26886.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 2,
+    "fields": {
+        "title": "The Little Prince",
+        "author": "Antoine de Saint-Exupery",
+        "cover": "Hard",
+        "inventory": 10,
+        "daily_fee": "0.55",
+        "image": "uploads/movies/the-little-prince-0b6f8829-ca41-442e-afc4-7f4a4aaab719.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 3,
+    "fields": {
+        "title": "Animal Farm",
+        "author": "George Orwell",
+        "cover": "Hard",
+        "inventory": 12,
+        "daily_fee": "0.45",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 4,
+    "fields": {
+        "title": "A history of Ukraine. A short course",
+        "author": "Oleksandr Palii",
+        "cover": "Hard",
+        "inventory": 5,
+        "daily_fee": "0.50",
+        "image": "uploads/movies/a-history-of-ukraine-a-short-course-d6bd7533-4b33-4dbc-b32e-371788462bfd.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 5,
+    "fields": {
+        "title": "Travelbook. Ukraine",
+        "author": "Iryna Taranenko, Mariya Vorobyova, Marta Leshak, Yuliia Kurova",
+        "cover": "Hard",
+        "inventory": 2,
+        "daily_fee": "0.87",
+        "image": "uploads/movies/travelbook-ukraine-bac78bde-dfd2-42fc-90b2-961e4a8dd8db.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 6,
+    "fields": {
+        "title": "Internal Medicine: in 2 books. Book 1. Diseases of the Cardiovascular and Respiratory Systems",
+        "author": "Nestor Seredyuk, Ihor Vakalyuk, Roman Yatsyshyn",
+        "cover": "Soft",
+        "inventory": 1,
+        "daily_fee": "1.32",
+        "image": "uploads/movies/internal-medicine-in-2-books-book-1-diseases-of-the-cardiovascular-and-re_xN7gCfh.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 7,
+    "fields": {
+        "title": "Internal Medicine. In 2 books. Book 2. Diseases of the Digestive System, Kidney, Rheumatic and Hematological Diseases",
+        "author": "Nestor Seredyuk, Ihor Vakalyuk, Roman Yatsyshyn",
+        "cover": "Soft",
+        "inventory": 101,
+        "daily_fee": "1.32",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 8,
+    "fields": {
+        "title": "The Case of Charles Dexter Ward",
+        "author": "Howard Phillips Lovecraft",
+        "cover": "Hard",
+        "inventory": 12,
+        "daily_fee": "0.75",
+        "image": "uploads/movies/the-case-of-charles-dexter-ward-497409b1-6da4-45ac-8870-15c06a653f47.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 9,
+    "fields": {
+        "title": "The Adventures of Sherlock Holmes. Volume I",
+        "author": "Arthur Conan Doyle",
+        "cover": "Hard",
+        "inventory": 9,
+        "daily_fee": "0.18",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 10,
+    "fields": {
+        "title": "The Adventures of Sherlock Holmes. Volume II",
+        "author": "Arthur Conan Doyle",
+        "cover": "Hard",
+        "inventory": 9,
+        "daily_fee": "0.25",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 11,
+    "fields": {
+        "title": "Moby Dick or, The Whale",
+        "author": "Herman Melville",
+        "cover": "Soft",
+        "inventory": 5,
+        "daily_fee": "0.30",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 12,
+    "fields": {
+        "title": "Persuasion",
+        "author": "Jane Austen",
+        "cover": "Soft",
+        "inventory": 13,
+        "daily_fee": "0.12",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 13,
+    "fields": {
+        "title": "Dream Days",
+        "author": "Kenneth Grahame",
+        "cover": "Hard",
+        "inventory": 11,
+        "daily_fee": "0.25",
+        "image": "uploads/movies/dream-days-4e455f91-9a79-43bc-8283-27706df6ab4e.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 14,
+    "fields": {
+        "title": "Oliver Twist",
+        "author": "Charles Dickens",
+        "cover": "Hard",
+        "inventory": 15,
+        "daily_fee": "0.14",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 15,
+    "fields": {
+        "title": "1984",
+        "author": "George Orwell",
+        "cover": "Hard",
+        "inventory": 14,
+        "daily_fee": "0.29",
+        "image": "uploads/movies/1984-2e4c1b50-7591-411f-8d19-9aae9df51073.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 16,
+    "fields": {
+        "title": "A Little Princess",
+        "author": "Frances Burnett",
+        "cover": "Hard",
+        "inventory": 5,
+        "daily_fee": "0.98",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 17,
+    "fields": {
+        "title": "The Haunter of the Dark",
+        "author": "Howard Phillips Lovecraft",
+        "cover": "Soft",
+        "inventory": 13,
+        "daily_fee": "0.34",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 18,
+    "fields": {
+        "title": "The House of the Seven Gables",
+        "author": "Nathaniel Hawthorne",
+        "cover": "Hard",
+        "inventory": 3,
+        "daily_fee": "0.26",
+        "image": "uploads/movies/the-house-of-the-seven-gables-3f0b0f97-924f-41f4-9c70-83358815862b.jpg"
+    }
+},
+{
+    "model": "book.book",
+    "pk": 19,
+    "fields": {
+        "title": "The Gold-Bug",
+        "author": "Edgar Allan Poe",
+        "cover": "Soft",
+        "inventory": 8,
+        "daily_fee": "0.22",
+        "image": ""
+    }
+},
+{
+    "model": "book.book",
+    "pk": 20,
+    "fields": {
+        "title": "International Economics. Microeconomics",
+        "author": "Nataliia Ilarionova",
+        "cover": "Soft",
+        "inventory": 1,
+        "daily_fee": "2.50",
+        "image": "uploads/movies/international-economics-microeconomics-7979fb01-2d7c-44d9-a2f1-96055e972e55.jpg"
+    }
+},
+{
+    "model": "user.user",
+    "pk": 1,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$X0SKz2mKJmOKEZBAcdEm7q$Ag4DSJ6CQaHk7VdPlC0lfYqAmSR4gjJIgPonhWGzEvo=",
+        "last_login": "2025-03-01T08:16:28.957Z",
+        "is_superuser": true,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": true,
+        "is_active": true,
+        "date_joined": "2025-02-28T13:56:28.228Z",
+        "email": "qwe@qwe.com",
+        "tg_chat": null,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 2,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$Kjo9kks7wz2AKk0yuOVW1r$GKa1qyJUHyT2sAW1DcQUOxWGLNB3BIX0RIwrndF+eS4=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-02-28T14:01:10.173Z",
+        "email": "user@admin.com",
+        "tg_chat": null,
+        "groups": [],
+        "user_permissions": []
+    }
+},
+{
+    "model": "user.user",
+    "pk": 3,
+    "fields": {
+        "password": "pbkdf2_sha256$870000$EBsmlc1jnRRLXeECJJz8zv$IuEc6RDaiLon9Q80365PMTC5N5o/MVJBSkNkDTnvPCI=",
+        "last_login": null,
+        "is_superuser": false,
+        "first_name": "",
+        "last_name": "",
+        "is_staff": false,
+        "is_active": true,
+        "date_joined": "2025-03-01T09:23:45.238Z",
+        "email": "user1@admin.com",
+        "tg_chat": null,
+        "groups": [],
+        "user_permissions": []
+    }
+}
+]
