@@ -2,19 +2,24 @@ from decimal import Decimal
 
 from django.contrib.auth import get_user_model
 from django.db.models import Q
+from django.db.models.signals import pre_save, post_save
 from django.test import TestCase
-from rest_framework import status
 from rest_framework.reverse import reverse
 from rest_framework.test import APIClient
 
 from book.models import Book
 from book.serializers import BookSerializer
+from book.signals import new_book_available
 
 BOOK_URL = reverse("book:book-list")
 
 
 class UnauthenticatedUserTests(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
 
         self.book1 = Book.objects.create(
@@ -95,7 +100,7 @@ class UnauthenticatedUserTests(TestCase):
         self.assertEqual(3, len(res.data))
 
     def test_filter_books_with_custom_filter_id(self):
-        res = self.client.get(BOOK_URL + "?id=1,3")
+        res = self.client.get(BOOK_URL + "?book_id=1,3")
         books = Book.objects.filter(id__in=[1, 3])
         expected_result = BookSerializer(books, many=True).data
 
@@ -174,7 +179,8 @@ class UnauthenticatedUserTests(TestCase):
         self.assertEqual(0, len(res.data))
 
     def test_filter_books_with_custom_filter_all_together(self):
-        res = self.client.get(BOOK_URL + "?id=1,3&author=seredyuk&min_fee=0.7")
+        res = self.client.get(BOOK_URL + "?book_id=1,"
+                                         "3&author=seredyuk&min_fee=0.7")
         self.assertEqual(1, len(res.data))
 
     def test_pagination_works(self):
@@ -192,6 +198,10 @@ class UnauthenticatedUserTests(TestCase):
 
 class AuthenticatedUserTests(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             email="test@test.com", password="test_password"
@@ -222,6 +232,10 @@ class AuthenticatedUserTests(TestCase):
 
 class AdminUserTests(TestCase):
     def setUp(self):
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+        super().setUp()
+
         self.client = APIClient()
         self.user = get_user_model().objects.create_user(
             email="admin@test.com", password="admin_password", is_staff=True

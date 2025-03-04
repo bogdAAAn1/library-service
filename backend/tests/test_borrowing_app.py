@@ -1,6 +1,8 @@
 import json
+from unittest.mock import patch, Mock
 
 from django.contrib.auth import get_user_model
+from django.db.models.signals import pre_save, post_save
 from django.test import TestCase
 from django.urls import reverse
 from rest_framework.status import (
@@ -12,6 +14,7 @@ from rest_framework.status import (
 from rest_framework.test import APIClient
 
 from book.models import Book
+from book.signals import new_book_available
 from borrowing.models import Borrowing
 from payment.models import Payment
 
@@ -24,7 +27,29 @@ def parse_response(response):
 
 class TestBorrowingForUser(TestCase):
     def setUp(self):
+        super().setUp()
+
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+
+        self.send_borrows_to_email_patcher = patch(
+            "borrowing.tasks.send_borrows_to_email.delay")
+        self.mock_send_borrows_to_email = self.send_borrows_to_email_patcher.start()
+
+        self.send_notification_to_telegram_patcher = patch(
+            "borrowing.tasks.send_notification_to_telegram.delay")
+        self.mock_send_notification_to_telegram = self.send_notification_to_telegram_patcher.start()
+
+        self.morning_borrow_update_patcher = patch(
+            "borrowing.tasks.morning_borrow_update.delay")
+        self.mock_morning_borrow_update = self.morning_borrow_update_patcher.start()
+
+        self.send_user_almost_overdue_borrowing_notification_patcher = patch(
+            "borrowing.tasks.send_user_almost_overdue_borrowing_notification.delay")
+        self.mock_send_user_almost_overdue_borrowing_notification = self.send_user_almost_overdue_borrowing_notification_patcher.start()
+
         self.client = APIClient()
+
         self.book1 = Book.objects.create(
             title="test1",
             author="test1",
@@ -49,6 +74,13 @@ class TestBorrowingForUser(TestCase):
             "expected_return_date": "2025-04-28",
             "book": 1
         }
+
+    def tearDown(self):
+        self.send_borrows_to_email_patcher.stop()
+        self.send_notification_to_telegram_patcher.stop()
+        self.send_user_almost_overdue_borrowing_notification_patcher.stop()
+        self.morning_borrow_update_patcher.stop()
+        super().tearDown()
 
     def test_create_borrowing(self):
         self.client.force_authenticate(self.user1)
@@ -159,7 +191,13 @@ class TestBorrowingForUser(TestCase):
             "You can`t do this"
         )
 
-    def test_borrowing_return(self):
+    @patch("stripe.checkout.Session.create")
+    def test_borrowing_return(self, mock_stripe_create):
+        mock_session = Mock()
+        mock_session.id = "test_session_id"
+        mock_session.url = "https://test-url.com"
+        mock_stripe_create.return_value = mock_session
+
         self.client.force_authenticate(self.user1)
         self.client.post(
             BORROWING_LIST_URL,
@@ -184,7 +222,13 @@ class TestBorrowingForUser(TestCase):
         book = Book.objects.get(pk=Borrowing.objects.last().book.id)
         self.assertEqual(book.inventory, 10)
 
-    def test_borrowing_return_again(self):
+    @patch("stripe.checkout.Session.create")
+    def test_borrowing_return_again(self, mock_stripe_create):
+        mock_session = Mock()
+        mock_session.id = "test_session_id"
+        mock_session.url = "https://test-url.com"
+        mock_stripe_create.return_value = mock_session
+
         self.client.force_authenticate(self.user1)
         self.client.post(
             BORROWING_LIST_URL,
@@ -208,6 +252,27 @@ class TestBorrowingForUser(TestCase):
 
 class TestBorrowingForAdmin(TestCase):
     def setUp(self):
+        super().setUp()
+
+        pre_save.disconnect(new_book_available, sender=Book)
+        post_save.disconnect(new_book_available, sender=Book)
+
+        self.send_borrows_to_email_patcher = patch(
+            "borrowing.tasks.send_borrows_to_email.delay")
+        self.mock_send_borrows_to_email = self.send_borrows_to_email_patcher.start()
+
+        self.send_notification_to_telegram_patcher = patch(
+            "borrowing.tasks.send_notification_to_telegram.delay")
+        self.mock_send_notification_to_telegram = self.send_notification_to_telegram_patcher.start()
+
+        self.morning_borrow_update_patcher = patch(
+            "borrowing.tasks.morning_borrow_update.delay")
+        self.mock_morning_borrow_update = self.morning_borrow_update_patcher.start()
+
+        self.send_user_almost_overdue_borrowing_notification_patcher = patch(
+            "borrowing.tasks.send_user_almost_overdue_borrowing_notification.delay")
+        self.mock_send_user_almost_overdue_borrowing_notification = self.send_user_almost_overdue_borrowing_notification_patcher.start()
+
         self.client = APIClient()
         self.book1 = Book.objects.create(
             title="test1",
@@ -234,6 +299,13 @@ class TestBorrowingForAdmin(TestCase):
             "expected_return_date": "2025-04-28",
             "book": 1
         }
+
+    def tearDown(self):
+        self.send_borrows_to_email_patcher.stop()
+        self.send_notification_to_telegram_patcher.stop()
+        self.send_user_almost_overdue_borrowing_notification_patcher.stop()
+        self.morning_borrow_update_patcher.stop()
+        super().tearDown()
 
     def test_borrowing_list_for_admin(self):
         self.client.force_authenticate(self.user1)
