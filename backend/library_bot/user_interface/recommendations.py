@@ -11,10 +11,16 @@ from library_bot.user_interface.buttons import send_back_button
 async def get_random_book(update: Update, context: CallbackContext) -> Book:
     sum_of_books = await sync_to_async(Book.objects.count)()
     random_index = random.randint(0, sum_of_books - 1)
-    recommended_book = await sync_to_async(lambda: Book.objects.all()[random_index])()
+    recommended_book = await sync_to_async(
+        lambda: Book.objects.all()[random_index]
+    )()
     return recommended_book
 
-async def send_recommend_book(update: Update, context: CallbackContext) -> None:
+
+async def send_recommend_book(
+        update: Update,
+        context: CallbackContext
+) -> None:
     recommended_book = await get_random_book(update, context)
 
     await update.callback_query.message.reply_text(
