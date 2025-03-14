@@ -18,7 +18,7 @@ from schemas.payment_schema_decorator import payment_schema_view, payment_succes
 class PaymentViewSet(
     mixins.ListModelMixin, mixins.RetrieveModelMixin, viewsets.GenericViewSet
 ):
-    queryset = Payment.objects.select_related()
+    queryset = Payment.objects.select_related("borrowing")
     serializer_class = PaymentSerializer
     permission_classes = (IsAuthenticated,)
 
@@ -26,7 +26,7 @@ class PaymentViewSet(
         user = self.request.user
 
         if user.is_staff:
-            return Payment.objects.select_related()
+            return Payment.objects.select_related("borrowing")
         return Payment.objects.select_related().filter(borrowing_id__user=user)
 
 
